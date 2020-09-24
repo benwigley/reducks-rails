@@ -1,0 +1,17 @@
+{
+  "name": "reducks-rails",
+  "version": "1.0.0",
+  "description": "Hook up Redux to Rails using the Reducks method",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "redux",
+    "reducks",
+    "rest",
+    "api",
+    "rails",
+    "redux-rails"
+  ],
+  "author": "Ben Wigley (http://github.com/benwigley)",
+  "license": "ISC"
+}
