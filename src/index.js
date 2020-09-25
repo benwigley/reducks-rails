@@ -1,7 +1,7 @@
-import reducksRailsMiddleware from './reducksRailsMiddleware'
-import ReducksBaseCollection from './reducks/ReducktsBaseCollection'
+import initReducksRailsMiddleware from './middleware/initReducksRailsMiddleware'
+import ReducksBaseCollection from './reducks/ReducksBaseCollection'
 
 export {
   ReducksBaseCollection,
-  reducksRailsMiddleware,
+  initReducksRailsMiddleware,
 }

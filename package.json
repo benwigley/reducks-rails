@@ -2,8 +2,10 @@
   "name": "reducks-rails",
   "version": "1.0.0",
   "description": "Hook up Redux to Rails using the Reducks method",
-  "main": "index.js",
-  "scripts": {},
+  "main": "dist/reducks-rails.js",
+  "scripts": {
+    "build": "webpack --progress --config webpack.config.js"
+  },
   "keywords": [
     "redux",
     "reducks",
@@ -13,5 +15,35 @@
     "redux-rails"
   ],
   "author": "Ben Wigley (http://github.com/benwigley)",
-  "license": "ISC"
+  "license": "ISC",
+  "peerDependencies": {
+    "redux": ">=3.6.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-typescript": "^7.10.4",
+    "axios": "^0.20.0",
+    "babel-loader": "^8.1.0",
+    "humps": "^2.0.1",
+    "jest": "^26.4.2",
+    "lodash": "^4.17.20",
+    "nock": "^13.0.4",
+    "path": "^0.12.7",
+    "pluralize": "^8.0.0",
+    "redux": "^4.0.5",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.11.2",
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8"
+  },
+  "jest": {
+    "testRegex": "(/test/.*\\.spec.js)$",
+    "collectCoverageFrom": [
+      "src/**"
+    ]
+  }
 }

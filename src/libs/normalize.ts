@@ -1,4 +1,4 @@
-import normalizedMerge from './normalizedMerge'
+import normalizedMerge from './normalizedMerge.ts'
 import pluralize from 'pluralize'
 import { map, keyBy, isArray, cloneDeep, unionWith } from 'lodash'
 import CollectionsLookup from '../reducks/CollectionsLookupInterface'

@@ -1,11 +1,11 @@
-import initReduxApiMiddleware from './middleware/reduxApiMiddleware'
-import asyncDispatchMiddleware from './middleware/asyncDispatchMiddleware'
+import initReduxApiMiddleware from './initReduxApiMiddleware'
+import asyncDispatchMiddleware from './asyncDispatchMiddleware'
 
-const reducksRailsMiddleware = function(apiConfig) {
+const initReducksRailsMiddleware = function(apiConfig) {
   return [
     initReduxApiMiddleware(apiConfig),
     asyncDispatchMiddleware
   ]
 }
 
-export default reducksRailsMiddleware
+export default initReducksRailsMiddleware

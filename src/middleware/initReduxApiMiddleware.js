@@ -1,7 +1,7 @@
 import humps from 'humps'
 import logger from '../libs/logger'
 import initApi from '../libs/api'
-import requestTypeModifer from '../libs/requestTypeModifer'
+import actionTypeModifiers from '../libs/actionTypeModifiers'
 
 const initReduxApiMiddleware = (apiConfig) => {
 
@@ -30,7 +30,7 @@ const initReduxApiMiddleware = (apiConfig) => {
     // Inform the reducer that the request has been started
     next({
       ...action,
-      type: requestTypeModifer.requestState(action.type)
+      type: actionTypeModifiers.requestState(action.type)
     })
 
     const requestParams = {
@@ -48,7 +48,7 @@ const initReduxApiMiddleware = (apiConfig) => {
         // Inform the reducer that the request was successful
         next({
           ...action,
-          type: requestTypeModifer.successState(action.type),
+          type: actionTypeModifiers.successState(action.type),
           payload: res.data,
         })
         return { res: res.data }
@@ -65,7 +65,7 @@ const initReduxApiMiddleware = (apiConfig) => {
         // Inform the reducer that the request failed
         next({
           ...action,
-          type: requestTypeModifer.failureState(action.type),
+          type: actionTypeModifiers.failureState(action.type),
           payload: responseData,
         })
         return { res: responseData }
