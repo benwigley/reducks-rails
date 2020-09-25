@@ -41,7 +41,7 @@ export default class ReducksBaseCollection {
   constructor() {
 
     // IMPORTANT These must be overriden!
-    this.collectionSchema = null
+    this.schema = null
     this.mainSchema = null // '{ users: { collection: 'users', etc... } }'
 
     // Set this to an attribute to have your collection ordered
@@ -69,13 +69,13 @@ export default class ReducksBaseCollection {
     // Validate that the schema has been set,
     // that is is an object, and that it has
     // a collection property that is a string
-    if (!this.collectionSchema || typeof this.collectionSchema != 'object') {
-      throw new Error("Collections must set this.collectionSchema in contsructor(). Expected type 'object', got type '" + typeof this.collectionSchema + "'")
+    if (!this.schema || typeof this.schema != 'object') {
+      throw new Error("Collections must set this.schema in contsructor(). Expected type 'object', got type '" + typeof this.schema + "'")
     }
-    if (!this.collectionSchema.collection || typeof this.collectionSchema.collection != 'string') {
-      throw new Error("Expected this.collectionSchema.collection to be of type 'string', but got type '" + typeof this.collectionSchema.collection + "'")
+    if (!this.schema.collection || typeof this.schema.collection != 'string') {
+      throw new Error("Expected this.schema.collection to be of type 'string', but got type '" + typeof this.schema.collection + "'")
     }
-    return this.collectionSchema
+    return this.schema
   }
 
   getMainSchema() {
@@ -138,42 +138,40 @@ export default class ReducksBaseCollection {
     logger.log(`ReducksBaseCollection:${this.constructor.name}:processApiSuccess`)
     if (!dataTransformer) dataTransformer = (normalizedData, newState) => newState
 
-    if (!action.payload.pkg) {
-      return {
-        ...state,
-        isLoading: false,
-        lastApiRequestSuccesful: true,
-        errors: []
-      }
+    const returnState = {
+      ...state,
+      isLoading: false,
+      lastApiRequestSuccesful: true,
+      errors: [],
+      metaData: action.payload.metaData,
+    }
+
+    if (!action.payload.response) {
+      return returnState
     }
 
     // Handle destroy requests where the entity no base entity is returned,
     // and no collection is returned, but other nested items are returned.
-    if (!action.payload.pkg.id && !isArray(action.payload.pkg)) {
+    if (!action.payload.response.id && !isArray(action.payload.response)) {
 
       // An entity was probably deleted, but there might be other
       // models or collections of models, so check before continuing.
-      if (action.payload.pkg && isArray(this.getCollectionSchema().nested)) {
+      if (action.payload.response && isArray(this.getCollectionSchema().nested)) {
         this.getCollectionSchema().nested.forEach(nestedSchema => {
           // Check if a relation exists
-          if (action.payload.pkg[nestedSchema.key]) {
+          if (action.payload.response[nestedSchema.key]) {
             // It doesn, so find the schema for that relation
             const relationsSchema = this.getMainSchema()[nestedSchema.collection]
-            const normalizedData = normalize(action.payload.pkg[nestedSchema.key], relationsSchema, this.getMainSchema())
+            const normalizedData = normalize(action.payload.response[nestedSchema.key], relationsSchema, this.getMainSchema())
             action.asyncDispatch(setEntities(normalizedData))
           }
         })
       }
 
-      return {
-        ...state,
-        isLoading: false,
-        lastApiRequestSuccesful: true,
-        errors: []
-      }
+      return returnState
     }
 
-    const normalizedData = normalize(action.payload.pkg, this.getCollectionSchema(), this.getMainSchema())
+    const normalizedData = normalize(action.payload.response, this.getCollectionSchema(), this.getMainSchema())
     action.asyncDispatch(setEntities(normalizedData))
     // Fist, merge the newState into the old state
     let newState = normalizedMerge(state, {

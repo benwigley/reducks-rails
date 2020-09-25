@@ -34,7 +34,7 @@ function processNestedCollections(withSchema: Schema, entitiesArray: Entity[], b
   if (!isArray(schema.nested)) {
     schema.nested = [schema.nested]
   }
-  hydrateSchema(schema, reducksSchema)
+  hydrateSchema(schema, mainSchema)
   schema.nested.forEach((nestedSchema: Schema) => {
     if (!baseCollectionsLookup[nestedSchema.collection]) baseCollectionsLookup[nestedSchema.collection] = {}
     for (let index = 0; index < entitiesArray.length; index++) {
@@ -53,7 +53,7 @@ function processNestedCollections(withSchema: Schema, entitiesArray: Entity[], b
 
         // Recursive Call For Deeply Nested Entities
         // If there is another nested item below this one, then we will need to process that too, and so on.
-        hydrateSchema(nestedSchema, reducksSchema)
+        hydrateSchema(nestedSchema, mainSchema)
         if (!nestedSchema.key) nestedSchema.key = nestedSchema.collection
         if (nestedSchema.nested) {
           // We process the most deeply nested relations first by calling this function before processing each nested item.

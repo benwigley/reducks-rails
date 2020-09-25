@@ -1,6 +1,7 @@
 // https://github.com/axios/axios
 import axios from 'axios'
 import humps from 'humps'
+import logger from './logger'
 import { defaults } from 'lodash'
 
 function initApi(apiConfig={}) {

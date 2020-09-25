@@ -1,7 +1,8 @@
 import thunkMiddleware from 'redux-thunk'
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
+import logger from 'redux-logger'
 import {
-  reducksRailsMiddleware
+  initReducksRailsMiddleware
 } from 'reducks-rails'
 
 // Reducers
@@ -12,7 +13,8 @@ import posts from './reducks/posts'
 const sessionStorage = {}
 
 const reducksRailsConfig = {
-  baseUrl: '/',         // (required)
+  debug: true,
+  baseUrl: 'http://localhost:3000/',         // (required)
   onError: () => { },   // (optional)
   axiosConfig: {        // (optional)
     // pass configuration directly to axios (ajax utility)
@@ -23,6 +25,13 @@ const reducksRailsConfig = {
   },
   camelCaseClientData: true,
   snakeCaseServerData: true,
+
+  parse: (json) => {
+    return json
+  },
+  setMetadata: (json) => {
+    return {}
+  },
 
   // Modify the recieved response data
   transformResponse: (data, headers) => { return data },
@@ -59,9 +68,10 @@ export default (initialState = {}) => {
       users: users.reducer,
     }),
     initialState,
-    compose(applyMiddleware([
+    compose(applyMiddleware(
       thunkMiddleware, // !IMPORTANT: Place thunk at the top
-      ...reducksRailsMiddleware(reducksRailsConfig)
-    ]))
+      logger,
+      ...initReducksRailsMiddleware(reducksRailsConfig)
+    ))
   )
 }

@@ -20057,10 +20057,10 @@ __webpack_require__.r(__webpack_exports__);
 //    below to get a more specific type depending on what action we want to dispatch.
 //    We can then do the same in our reducers to catch those specific actions.
 // Api Request States
+const REQUEST = "REQUEST";
+const FAILURE = "FAILURE";
+const SUCCESS = "SUCCESS";
 /* harmony default export */ __webpack_exports__["default"] = ({
-  REQUEST: "REQUEST",
-  FAILURE: "FAILURE",
-  SUCCESS: "SUCCESS",
   requestTypeModifier: function (type) {
     return `${type}:${REQUEST}`;
   },
@@ -20087,9 +20087,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var humps__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! humps */ "./node_modules/humps/humps.js");
 /* harmony import */ var humps__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(humps__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _logger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./logger */ "./src/libs/logger.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
 // https://github.com/axios/axios
+
 
 
 
@@ -20097,7 +20099,7 @@ __webpack_require__.r(__webpack_exports__);
 function initApi(apiConfig = {}) {
   // `apiConfig` has come from the developer
   // so will take priority over our defaults
-  apiConfig = Object(lodash__WEBPACK_IMPORTED_MODULE_2__["defaults"])(apiConfig, {
+  apiConfig = Object(lodash__WEBPACK_IMPORTED_MODULE_3__["defaults"])(apiConfig, {
     debug: false,
     baseUrl: '/',
     axiosConfig: {},
@@ -20136,12 +20138,12 @@ function initApi(apiConfig = {}) {
   } // Take any axio config give by the user
 
 
-  let axiosConfig = Object(lodash__WEBPACK_IMPORTED_MODULE_2__["defaults"])(apiConfig.axiosConfig, {
+  let axiosConfig = Object(lodash__WEBPACK_IMPORTED_MODULE_3__["defaults"])(apiConfig.axiosConfig, {
     baseURL: apiConfig.baseUrl,
     withCredentials: false,
     // This threw an error when set to true
     timeout: 20000,
-    headers: Object(lodash__WEBPACK_IMPORTED_MODULE_2__["defaults"])(apiConfig.axiosConfig.headers || {}, {
+    headers: Object(lodash__WEBPACK_IMPORTED_MODULE_3__["defaults"])(apiConfig.axiosConfig.headers || {}, {
       'Content-Type': 'application/json'
     }),
     responseType: 'json',
@@ -20170,7 +20172,8 @@ function initApi(apiConfig = {}) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const utilities = requrie('./utilties');
+/* harmony import */ var _utilities__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utilities */ "./src/libs/utilities.js");
+
 
 const logger = (() => {
   let inGroup = false;
@@ -20203,7 +20206,7 @@ const logger = (() => {
 
     const styles = [`background: ${methodToColorMap[method]}`, `border-radius: 3px`, `color: white`, `font-weight: bold`, `padding: 2px 0.4em`]; // When in a group, the workbox prefix is not displayed.
 
-    const logPrefix = inGroup ? [] : ['%ctjmer', styles.join(';')]; // Log styles don't seem to work in node, so just skip it
+    const logPrefix = inGroup ? [] : ['%creducks-rails', styles.join(';')]; // Log styles don't seem to work in node, so just skip it
 
     if (typeof window === 'undefined') {
       console[method](...args);
@@ -20231,9 +20234,9 @@ const logger = (() => {
       }
 
       if (method == 'debug') {
-        if (utilities.isServer()) {// && !config.debugServer
+        if (_utilities__WEBPACK_IMPORTED_MODULE_0__["default"].isServer()) {// && !config.debugServer
           // Skip
-        } else if (utilities.isBrowser()) {// && !config.debugBrowser
+        } else if (_utilities__WEBPACK_IMPORTED_MODULE_0__["default"].isBrowser()) {// && !config.debugBrowser
           // Skip
         } else {
           print(method, args);
@@ -20301,7 +20304,7 @@ function processNestedCollections(withSchema, entitiesArray, baseCollectionsLook
     schema.nested = [schema.nested];
   }
 
-  hydrateSchema(schema, reducksSchema);
+  hydrateSchema(schema, mainSchema);
   schema.nested.forEach(nestedSchema => {
     if (!baseCollectionsLookup[nestedSchema.collection]) baseCollectionsLookup[nestedSchema.collection] = {};
 
@@ -20320,7 +20323,7 @@ function processNestedCollections(withSchema, entitiesArray, baseCollectionsLook
         const nestedSchemasArray = isNestedItemAnArray ? entitiesArray[index][nestedSchema.key] : [entitiesArray[index][nestedSchema.key]]; // Recursive Call For Deeply Nested Entities
         // If there is another nested item below this one, then we will need to process that too, and so on.
 
-        hydrateSchema(nestedSchema, reducksSchema);
+        hydrateSchema(nestedSchema, mainSchema);
         if (!nestedSchema.key) nestedSchema.key = nestedSchema.collection;
 
         if (nestedSchema.nested) {
@@ -20473,6 +20476,30 @@ function normalizedMerge(existingState, newState, shouldLog = false) {
 
 /***/ }),
 
+/***/ "./src/libs/utilities.js":
+/*!*******************************!*\
+  !*** ./src/libs/utilities.js ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  isServer: function () {
+    return typeof window === 'undefined';
+  },
+  isBrowser: function () {
+    return typeof window !== 'undefined';
+  },
+  isDevice: function () {
+    return this.isBrowser() && !!navigator.platform && /iPad|iPhone|iPod|ReactNative/.test(navigator.platform);
+  },
+  apiConfig: {}
+});
+
+/***/ }),
+
 /***/ "./src/middleware/asyncDispatchMiddleware.js":
 /*!***************************************************!*\
   !*** ./src/middleware/asyncDispatchMiddleware.js ***!
@@ -20555,11 +20582,77 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const initReduxApiMiddleware = apiConfig => {
-  _libs_logger__WEBPACK_IMPORTED_MODULE_1__["default"].shouldLog = apiConfig.debug; // Init the api here so that it doesn't
+const parseResult = (json, inConfig) => {
+  const reponseParser = inConfig.parse;
+  const setMetadata = inConfig.setMetadata;
+  let response;
+  let metaData = {}; // parse and metaData methods are currently not
+  // per-collection, but this would be nice in the future.
+
+  switch (typeof reponseParser) {
+    case 'object':
+      {
+        const parseMethod = reponseParser && reponseParser[resourceType];
+
+        if (!parseMethod) {
+          response = json;
+          break;
+        }
+
+        response = parseMethod(json);
+        break;
+      }
+
+    case 'function':
+      {
+        response = reponseParser(json);
+        break;
+      }
+
+    default:
+      {
+        response = json;
+        break;
+      }
+  }
+
+  switch (typeof setMetadata) {
+    case 'object':
+      {
+        const setMetadata = setMetadata && setMetadata[resourceType];
+
+        if (!setMetadata) {
+          break;
+        }
+
+        metaData = setMetadata(json);
+        break;
+      }
+
+    case 'function':
+      {
+        metaData = setMetadata(json);
+        break;
+      }
+
+    default:
+      {
+        metaData = {};
+        break;
+      }
+  }
+
+  return {
+    response,
+    metaData
+  };
+};
+
+const initReduxApiMiddleware = inConfig => {
+  _libs_logger__WEBPACK_IMPORTED_MODULE_1__["default"].shouldLog = inConfig.debug; // Init the api here so that it doesn't
   // get recreated on every new dispatch
 
-  const api = Object(_libs_api__WEBPACK_IMPORTED_MODULE_2__["default"])(apiConfig);
+  const api = Object(_libs_api__WEBPACK_IMPORTED_MODULE_2__["default"])(inConfig);
 
   const reduxApiMiddleware = store => next => action => {
     // Here we check whether an "api" or "nodeApi" key:object
@@ -20572,13 +20665,13 @@ const initReduxApiMiddleware = apiConfig => {
 
     if (typeof action.api !== 'object') {
       throw new Error(`ReducksRails: Expected action.api to be type 'object', but got type '${typeof action.api}'`);
-    } else if (typeof action.api !== 'string') {
+    } else if (typeof action.api.url !== 'string') {
       throw new Error(`ReducksRails: Expected action.api.url to be type 'string', but got type '${typeof action.api.url}'`);
     } // Inform the reducer that the request has been started
 
 
     next({ ...action,
-      type: _libs_actionTypeModifiers__WEBPACK_IMPORTED_MODULE_3__["default"].requestState(action.type)
+      type: _libs_actionTypeModifiers__WEBPACK_IMPORTED_MODULE_3__["default"].requestTypeModifier(action.type)
     });
     const requestParams = {
       url: action.api.url,
@@ -20593,13 +20686,12 @@ const initReduxApiMiddleware = apiConfig => {
 
     return api.request(requestParams).then(res => {
       // Inform the reducer that the request was successful
+      console.log('next:', _libs_actionTypeModifiers__WEBPACK_IMPORTED_MODULE_3__["default"].successTypeModifier(action.type));
       next({ ...action,
-        type: _libs_actionTypeModifiers__WEBPACK_IMPORTED_MODULE_3__["default"].successState(action.type),
-        payload: res.data
+        type: _libs_actionTypeModifiers__WEBPACK_IMPORTED_MODULE_3__["default"].successTypeModifier(action.type),
+        payload: parseResult(res.data, inConfig)
       });
-      return {
-        res: res.data
-      };
+      return res.data;
     }).catch(e => {
       _libs_logger__WEBPACK_IMPORTED_MODULE_1__["default"].debug(`libs/reduxApi:failed:${action.api.url}`, e);
       const data = ((e || {}).response || {}).data;
@@ -20607,18 +20699,16 @@ const initReduxApiMiddleware = apiConfig => {
         errors: [e.toString()]
       };
 
-      if (typeof apiConfig.onError === 'function') {
-        apiConfig.onError(responseData);
+      if (typeof inConfig.onError === 'function') {
+        inConfig.onError(responseData);
       } // Inform the reducer that the request failed
 
 
       next({ ...action,
-        type: _libs_actionTypeModifiers__WEBPACK_IMPORTED_MODULE_3__["default"].failureState(action.type),
+        type: _libs_actionTypeModifiers__WEBPACK_IMPORTED_MODULE_3__["default"].failureTypeModifier(action.type),
         payload: responseData
       });
-      return {
-        res: responseData
-      };
+      return responseData;
     });
   };
 
@@ -20684,7 +20774,7 @@ function setEntities(normalizedData) {
 class ReducksBaseCollection {
   constructor() {
     // IMPORTANT These must be overriden!
-    this.collectionSchema = null;
+    this.schema = null;
     this.mainSchema = null; // '{ users: { collection: 'users', etc... } }'
     // Set this to an attribute to have your collection ordered
 
@@ -20710,15 +20800,15 @@ class ReducksBaseCollection {
     // Validate that the schema has been set,
     // that is is an object, and that it has
     // a collection property that is a string
-    if (!this.collectionSchema || typeof this.collectionSchema != 'object') {
-      throw new Error("Collections must set this.collectionSchema in contsructor(). Expected type 'object', got type '" + typeof this.collectionSchema + "'");
+    if (!this.schema || typeof this.schema != 'object') {
+      throw new Error("Collections must set this.schema in contsructor(). Expected type 'object', got type '" + typeof this.schema + "'");
     }
 
-    if (!this.collectionSchema.collection || typeof this.collectionSchema.collection != 'string') {
-      throw new Error("Expected this.collectionSchema.collection to be of type 'string', but got type '" + typeof this.collectionSchema.collection + "'");
+    if (!this.schema.collection || typeof this.schema.collection != 'string') {
+      throw new Error("Expected this.schema.collection to be of type 'string', but got type '" + typeof this.schema.collection + "'");
     }
 
-    return this.collectionSchema;
+    return this.schema;
   }
 
   getMainSchema() {
@@ -20781,40 +20871,38 @@ class ReducksBaseCollection {
   }) {
     _libs_logger__WEBPACK_IMPORTED_MODULE_0__["default"].log(`ReducksBaseCollection:${this.constructor.name}:processApiSuccess`);
     if (!dataTransformer) dataTransformer = (normalizedData, newState) => newState;
+    const returnState = { ...state,
+      isLoading: false,
+      lastApiRequestSuccesful: true,
+      errors: [],
+      metaData: action.payload.metaData
+    };
 
-    if (!action.payload.pkg) {
-      return { ...state,
-        isLoading: false,
-        lastApiRequestSuccesful: true,
-        errors: []
-      };
+    if (!action.payload.response) {
+      return returnState;
     } // Handle destroy requests where the entity no base entity is returned,
     // and no collection is returned, but other nested items are returned.
 
 
-    if (!action.payload.pkg.id && !Object(lodash__WEBPACK_IMPORTED_MODULE_4__["isArray"])(action.payload.pkg)) {
+    if (!action.payload.response.id && !Object(lodash__WEBPACK_IMPORTED_MODULE_4__["isArray"])(action.payload.response)) {
       // An entity was probably deleted, but there might be other
       // models or collections of models, so check before continuing.
-      if (action.payload.pkg && Object(lodash__WEBPACK_IMPORTED_MODULE_4__["isArray"])(this.getCollectionSchema().nested)) {
+      if (action.payload.response && Object(lodash__WEBPACK_IMPORTED_MODULE_4__["isArray"])(this.getCollectionSchema().nested)) {
         this.getCollectionSchema().nested.forEach(nestedSchema => {
           // Check if a relation exists
-          if (action.payload.pkg[nestedSchema.key]) {
+          if (action.payload.response[nestedSchema.key]) {
             // It doesn, so find the schema for that relation
             const relationsSchema = this.getMainSchema()[nestedSchema.collection];
-            const normalizedData = Object(_libs_normalize_ts__WEBPACK_IMPORTED_MODULE_1__["default"])(action.payload.pkg[nestedSchema.key], relationsSchema, this.getMainSchema());
+            const normalizedData = Object(_libs_normalize_ts__WEBPACK_IMPORTED_MODULE_1__["default"])(action.payload.response[nestedSchema.key], relationsSchema, this.getMainSchema());
             action.asyncDispatch(setEntities(normalizedData));
           }
         });
       }
 
-      return { ...state,
-        isLoading: false,
-        lastApiRequestSuccesful: true,
-        errors: []
-      };
+      return returnState;
     }
 
-    const normalizedData = Object(_libs_normalize_ts__WEBPACK_IMPORTED_MODULE_1__["default"])(action.payload.pkg, this.getCollectionSchema(), this.getMainSchema());
+    const normalizedData = Object(_libs_normalize_ts__WEBPACK_IMPORTED_MODULE_1__["default"])(action.payload.response, this.getCollectionSchema(), this.getMainSchema());
     action.asyncDispatch(setEntities(normalizedData)); // Fist, merge the newState into the old state
 
     let newState = Object(_libs_normalizedMerge_ts__WEBPACK_IMPORTED_MODULE_3__["default"])(state, {

@@ -3,13 +3,63 @@ import logger from '../libs/logger'
 import initApi from '../libs/api'
 import actionTypeModifiers from '../libs/actionTypeModifiers'
 
-const initReduxApiMiddleware = (apiConfig) => {
+const parseResult = (json, inConfig) => {
+  const reponseParser = inConfig.parse
+  const setMetadata = inConfig.setMetadata
+  let response
+  let metaData = {}
 
-  logger.shouldLog = apiConfig.debug
+  // parse and metaData methods are currently not
+  // per-collection, but this would be nice in the future.
+  switch(typeof reponseParser) {
+    case 'object': {
+      const parseMethod = reponseParser && reponseParser[resourceType]
+      if (!parseMethod) {
+        response = json
+        break
+      }
+
+      response = parseMethod(json)
+      break
+    }
+    case 'function': {
+      response = reponseParser(json)
+      break
+    }
+    default: {
+      response = json
+      break
+    }
+  }
+
+  switch(typeof setMetadata) {
+    case 'object': {
+      const setMetadata = setMetadata && setMetadata[resourceType]
+      if (!setMetadata) { break }
+
+      metaData = setMetadata(json)
+      break
+    }
+    case 'function': {
+      metaData = setMetadata(json)
+      break
+    }
+    default: {
+      metaData = {}
+      break
+    }
+  }
+
+  return { response, metaData }
+}
+
+const initReduxApiMiddleware = (inConfig) => {
+
+  logger.shouldLog = inConfig.debug
 
   // Init the api here so that it doesn't
   // get recreated on every new dispatch
-  const api = initApi(apiConfig)
+  const api = initApi(inConfig)
 
   const reduxApiMiddleware = (store) => (next) => (action) => {
 
@@ -23,14 +73,14 @@ const initReduxApiMiddleware = (apiConfig) => {
     // Here we check for a valid api object (url is required).
     if (typeof action.api !== 'object') {
       throw new Error(`ReducksRails: Expected action.api to be type 'object', but got type '${typeof action.api}'`)
-    } else if (typeof action.api !== 'string') {
+    } else if (typeof action.api.url !== 'string') {
       throw new Error(`ReducksRails: Expected action.api.url to be type 'string', but got type '${typeof action.api.url}'`)
     }
 
     // Inform the reducer that the request has been started
     next({
       ...action,
-      type: actionTypeModifiers.requestState(action.type)
+      type: actionTypeModifiers.requestTypeModifier(action.type)
     })
 
     const requestParams = {
@@ -46,29 +96,30 @@ const initReduxApiMiddleware = (apiConfig) => {
     return api.request(requestParams)
       .then((res) => {
         // Inform the reducer that the request was successful
+        console.log('next:', actionTypeModifiers.successTypeModifier(action.type));
         next({
           ...action,
-          type: actionTypeModifiers.successState(action.type),
-          payload: res.data,
+          type: actionTypeModifiers.successTypeModifier(action.type),
+          payload: parseResult(res.data, inConfig),
         })
-        return { res: res.data }
+        return res.data
       })
       .catch((e) => {
         logger.debug(`libs/reduxApi:failed:${action.api.url}`, e)
         const data = ((e || {}).response || {}).data
         const responseData = data || { errors: [e.toString()] }
 
-        if (typeof apiConfig.onError === 'function') {
-          apiConfig.onError(responseData)
+        if (typeof inConfig.onError === 'function') {
+          inConfig.onError(responseData)
         }
 
         // Inform the reducer that the request failed
         next({
           ...action,
-          type: actionTypeModifiers.failureState(action.type),
+          type: actionTypeModifiers.failureTypeModifier(action.type),
           payload: responseData,
         })
-        return { res: responseData }
+        return responseData
       })
   }
   return reduxApiMiddleware

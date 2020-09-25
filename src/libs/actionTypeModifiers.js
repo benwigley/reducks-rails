@@ -9,11 +9,11 @@
 
 // Api Request States
 
-export default {
-  REQUEST: "REQUEST",
-  FAILURE: "FAILURE",
-  SUCCESS: "SUCCESS",
+const REQUEST = "REQUEST"
+const FAILURE = "FAILURE"
+const SUCCESS = "SUCCESS"
 
+export default {
   requestTypeModifier: function(type) {
     return `${type}:${REQUEST}`
   },

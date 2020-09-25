@@ -1,4 +1,4 @@
-const utilities = requrie('./utilties')
+import utilities from './utilities'
 
 const logger = (() => {
   let inGroup = false
@@ -32,7 +32,7 @@ const logger = (() => {
     ]
 
     // When in a group, the workbox prefix is not displayed.
-    const logPrefix = inGroup ? [] : ['%ctjmer', styles.join(';')]
+    const logPrefix = inGroup ? [] : ['%creducks-rails', styles.join(';')]
 
     // Log styles don't seem to work in node, so just skip it
     if (typeof window === 'undefined') {

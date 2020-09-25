@@ -1,5 +1,5 @@
-import { ReducksCollection } from 'reducks-rails'
-import reducksSchemas from 'schemas'
+import { ReducksBaseCollection } from 'reducks-rails'
+import reducksSchemas from './schemas'
 
 
 // Types
@@ -7,7 +7,7 @@ export const UPDATE_USER_FIRST_NAME = '<app-namespace>/users/UPDATE_USER_FIRST_N
 
 
 // Reducks class
-class Users extends ReducksCollection {
+class Users extends ReducksBaseCollection {
 
   constructor() {
     super()
