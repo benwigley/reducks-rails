@@ -18,15 +18,13 @@ import { sortBy, isArray } from 'lodash'
 
 // Note:
 // Redux-ORM looks like a library that has already done much of what I'm doing.
-// I like my simple approach, but if I want idea, check that lib out.
+// I like my simple approach, but if I want ideas, check that lib out.
 // https://github.com/redux-orm/redux-orm
 
 
 // Types
-export const SET_ENTITIES = 'reducksRails/entities/SET_ENTITIES'
-export const SET_ENTITIES_FROM_OFFLINE_SYNC = 'reducksRails/entities/SET_ENTITIES_FROM_OFFLINE_SYNC'
-export const REMOVE_ENTITIES_FROM_OFFLINE_SYNC = 'reducksRails/entities/REMOVE_ENTITIES_FROM_OFFLINE_SYNC'
-export const SET_ENTITIES_FROM_STORE = 'reducksRails/entities/SET_ENTITIES_FROM_STORE'
+export const SET_ENTITIES             = 'reducksRails/entities/SET_ENTITIES'
+export const SET_ENTITIES_FROM_STATE  = 'tjmer/entities/SET_ENTITIES_FROM_STATE'
 
 // Action Creators
 export function setEntities(normalizedData) {
@@ -36,7 +34,14 @@ export function setEntities(normalizedData) {
   }
 }
 
-export default class ReducksBaseCollection {
+export function setEntitiesFromState(state) {
+  return {
+    type: SET_ENTITIES_FROM_STATE,
+    state,
+  }
+}
+
+export class ReducksBaseCollection {
 
   constructor() {
 
@@ -116,12 +121,13 @@ export default class ReducksBaseCollection {
           ids: this.orderIds(finalStateBeforeOrdering.ids, finalStateBeforeOrdering.entities)
         }
 
-      // This action expects normalizedData to be an
-      // exact clone of the entire apps store object.
-      case SET_ENTITIES_FROM_STORE:
-        if (!action.normalizedData[this.schema.collection]) return state
-        logger.debug(`${SET_ENTITIES_FROM_STORE}:${this.schema.collection}`, action.normalizedData[this.schema.collection])
-        finalStateBeforeOrdering = normalizedMerge(state, action.normalizedData[this.schema.collection])
+
+      // Allows setting of entities from state, ie. store.getState()
+      // Useful for saving state for later in localStorage etc
+      case SET_ENTITIES_FROM_STATE:
+        if (!action.normalizedData[collection]) return state
+        logger.debug(`${SET_ENTITIES_FROM_STATE}:${collection}`, action.normalizedData[collection])
+        finalStateBeforeOrdering = normalizedMerge(state, action.normalizedData[collection])
         return {
           ...finalStateBeforeOrdering,
           ids: this.orderIds(finalStateBeforeOrdering.ids, finalStateBeforeOrdering.entities)
@@ -138,7 +144,7 @@ export default class ReducksBaseCollection {
     const returnState = {
       ...state,
       isLoading: false,
-      lastApiRequestSuccesful: true,
+      lastRequestSuccesful: true,
       errors: [],
       metaData: action.payload.metaData,
     }
@@ -147,8 +153,8 @@ export default class ReducksBaseCollection {
       return returnState
     }
 
-    // Handle destroy requests where the entity no base entity is returned,
-    // and no collection is returned, but other nested items are returned.
+    // Handle destroy requests where no base entity or collection
+    // is returned, but other nested items are present in the payload
     if (!action.payload.response.id && !isArray(action.payload.response)) {
 
       // An entity was probably deleted, but there might be other
@@ -175,7 +181,7 @@ export default class ReducksBaseCollection {
       ids: normalizedData[this.getCollection()].ids,
       entities: normalizedData[this.getCollection()].entities,
       isLoading: false,
-      lastApiRequestSuccesful: true,
+      lastRequestSuccesful: true,
       errors: []
     })
     // Second, merge the result of the dataTransformer function into the newState
@@ -191,7 +197,7 @@ export default class ReducksBaseCollection {
     return {
       ...state,
       isLoading: false,
-      lastApiRequestSuccesful: false,
+      lastRequestSuccesful: false,
       errors: action.payload.errors
     }
   }
@@ -241,8 +247,10 @@ export default class ReducksBaseCollection {
 ReducksBaseCollection.prototype.initialState = {
   // Api Fetching states
   isLoading: false,
-  lastApiRequestSuccesful: null,
+  lastRequestSuccesful: null,
   errors: [],
   ids: [],
   entities: {}
 }
+
+export default ReducksBaseCollection
