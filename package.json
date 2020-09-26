@@ -4,8 +4,8 @@
   "description": "Hook up Redux to Rails using the Reducks method",
   "main": "dist/reducks-rails.js",
   "scripts": {
-    "start": "webpack --progress --watch --config webpack.config.js",
-    "build": "npm test && webpack --progress --config webpack.config.js",
+    "start": "webpack --env.development --progress --watch --config webpack.config.js",
+    "build": "npm test && webpack --env.production --progress --config webpack.config.js",
     "test": "jest --coverage --silent",
     "test:watch": "npm test -- --watch --bail"
   },
