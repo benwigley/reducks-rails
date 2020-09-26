@@ -26,7 +26,7 @@ class Posts extends ReducksBaseCollection {
   // Every Reducks Collection requires a reducer
   reducer(state, action = {}) {
     if (!state) state = this.initialState
-    state = super.reducer(state, action, this.collection)
+    state = super.reducer(state, action)
     switch (action.type) {
 
       // Rails: PostsController#posts
@@ -45,7 +45,7 @@ class Posts extends ReducksBaseCollection {
           state,
           action,
           dataTransformer: (normalizedData, newState) => {
-            newState.currentUsersPostIds = normalizedData[this.collection].ids
+            newState.currentUsersPostIds = normalizedData[this.schema.collection].ids
             return newState
           }
         })

@@ -2,6 +2,7 @@ import thunkMiddleware from 'redux-thunk'
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import logger from 'redux-logger'
 import {
+  registerCollections,
   initReducksRailsMiddleware
 } from 'reducks-rails'
 
@@ -64,8 +65,8 @@ const reducksRailsConfig = {
 export default (initialState = {}) => {
   return createStore(
     combineReducers({
-      posts: posts.reducer,
-      users: users.reducer,
+      // reducerName: myOtherReducer
+      ...registerCollections(users, posts)
     }),
     initialState,
     compose(applyMiddleware(

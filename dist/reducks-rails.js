@@ -20022,16 +20022,20 @@ module.exports = function(module) {
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/*! exports provided: ReducksBaseCollection, initReducksRailsMiddleware */
+/*! exports provided: registerCollections, ReducksBaseCollection, initReducksRailsMiddleware */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _middleware_initReducksRailsMiddleware__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./middleware/initReducksRailsMiddleware */ "./src/middleware/initReducksRailsMiddleware.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "initReducksRailsMiddleware", function() { return _middleware_initReducksRailsMiddleware__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+/* harmony import */ var _reducks_registerCollections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./reducks/registerCollections */ "./src/reducks/registerCollections.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "registerCollections", function() { return _reducks_registerCollections__WEBPACK_IMPORTED_MODULE_0__["default"]; });
 
 /* harmony import */ var _reducks_ReducksBaseCollection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./reducks/ReducksBaseCollection */ "./src/reducks/ReducksBaseCollection.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ReducksBaseCollection", function() { return _reducks_ReducksBaseCollection__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+
+/* harmony import */ var _middleware_initReducksRailsMiddleware__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./middleware/initReducksRailsMiddleware */ "./src/middleware/initReducksRailsMiddleware.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "initReducksRailsMiddleware", function() { return _middleware_initReducksRailsMiddleware__WEBPACK_IMPORTED_MODULE_2__["default"]; });
+
 
 
 
@@ -20476,6 +20480,23 @@ function normalizedMerge(existingState, newState, shouldLog = false) {
 
 /***/ }),
 
+/***/ "./src/libs/shared.js":
+/*!****************************!*\
+  !*** ./src/libs/shared.js ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// Shared state between necessary components of this library/npm module
+/* harmony default export */ __webpack_exports__["default"] = ({
+  inConfig: null,
+  collections: null
+});
+
+/***/ }),
+
 /***/ "./src/libs/utilities.js":
 /*!*******************************!*\
   !*** ./src/libs/utilities.js ***!
@@ -20550,13 +20571,16 @@ const asyncDispatchMiddleware = store => next => action => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _initReduxApiMiddleware__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./initReduxApiMiddleware */ "./src/middleware/initReduxApiMiddleware.js");
-/* harmony import */ var _asyncDispatchMiddleware__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./asyncDispatchMiddleware */ "./src/middleware/asyncDispatchMiddleware.js");
+/* harmony import */ var _libs_shared__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../libs/shared */ "./src/libs/shared.js");
+/* harmony import */ var _initReduxApiMiddleware__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./initReduxApiMiddleware */ "./src/middleware/initReduxApiMiddleware.js");
+/* harmony import */ var _asyncDispatchMiddleware__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./asyncDispatchMiddleware */ "./src/middleware/asyncDispatchMiddleware.js");
 
 
 
-const initReducksRailsMiddleware = function (apiConfig) {
-  return [Object(_initReduxApiMiddleware__WEBPACK_IMPORTED_MODULE_0__["default"])(apiConfig), _asyncDispatchMiddleware__WEBPACK_IMPORTED_MODULE_1__["default"]];
+
+const initReducksRailsMiddleware = function (inConfig) {
+  _libs_shared__WEBPACK_IMPORTED_MODULE_0__["default"].inConfig = inConfig;
+  return [Object(_initReduxApiMiddleware__WEBPACK_IMPORTED_MODULE_1__["default"])(inConfig), _asyncDispatchMiddleware__WEBPACK_IMPORTED_MODULE_2__["default"]];
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (initReducksRailsMiddleware);
@@ -20833,18 +20857,18 @@ class ReducksBaseCollection {
     return ids;
   }
 
-  reducer(state, action = {}, collection) {
+  reducer(state, action = {}) {
     let finalStateBeforeOrdering;
 
     switch (action.type) {
       // This action expects normalizedData to be a normalized
       // data object returned from the api middleware.
       case SET_ENTITIES:
-        if (!action.normalizedData[collection]) return state;
-        _libs_logger__WEBPACK_IMPORTED_MODULE_0__["default"].debug(`${SET_ENTITIES}:${collection}`, action.normalizedData[collection]);
+        if (!action.normalizedData[this.schema.collection]) return state;
+        _libs_logger__WEBPACK_IMPORTED_MODULE_0__["default"].debug(`${SET_ENTITIES}:${this.schema.collection}`, action.normalizedData[this.schema.collection]);
         finalStateBeforeOrdering = Object(_libs_normalizedMerge_ts__WEBPACK_IMPORTED_MODULE_3__["default"])(state, {
-          entities: action.normalizedData[collection].entities,
-          ids: action.normalizedData[collection].ids
+          entities: action.normalizedData[this.schema.collection].entities,
+          ids: action.normalizedData[this.schema.collection].ids
         });
         return { ...finalStateBeforeOrdering,
           ids: this.orderIds(finalStateBeforeOrdering.ids, finalStateBeforeOrdering.entities)
@@ -20853,9 +20877,9 @@ class ReducksBaseCollection {
       // exact clone of the entire apps store object.
 
       case SET_ENTITIES_FROM_STORE:
-        if (!action.normalizedData[collection]) return state;
-        _libs_logger__WEBPACK_IMPORTED_MODULE_0__["default"].debug(`${SET_ENTITIES_FROM_STORE}:${collection}`, action.normalizedData[collection]);
-        finalStateBeforeOrdering = Object(_libs_normalizedMerge_ts__WEBPACK_IMPORTED_MODULE_3__["default"])(state, action.normalizedData[collection]);
+        if (!action.normalizedData[this.schema.collection]) return state;
+        _libs_logger__WEBPACK_IMPORTED_MODULE_0__["default"].debug(`${SET_ENTITIES_FROM_STORE}:${this.schema.collection}`, action.normalizedData[this.schema.collection]);
+        finalStateBeforeOrdering = Object(_libs_normalizedMerge_ts__WEBPACK_IMPORTED_MODULE_3__["default"])(state, action.normalizedData[this.schema.collection]);
         return { ...finalStateBeforeOrdering,
           ids: this.orderIds(finalStateBeforeOrdering.ids, finalStateBeforeOrdering.entities)
         };
@@ -20891,7 +20915,7 @@ class ReducksBaseCollection {
         this.getCollectionSchema().nested.forEach(nestedSchema => {
           // Check if a relation exists
           if (action.payload.response[nestedSchema.key]) {
-            // It doesn, so find the schema for that relation
+            // It doesn't, so find the schema for that relation
             const relationsSchema = this.getMainSchema()[nestedSchema.collection];
             const normalizedData = Object(_libs_normalize_ts__WEBPACK_IMPORTED_MODULE_1__["default"])(action.payload.response[nestedSchema.key], relationsSchema, this.getMainSchema());
             action.asyncDispatch(setEntities(normalizedData));
@@ -20982,6 +21006,45 @@ ReducksBaseCollection.prototype.initialState = {
   ids: [],
   entities: {}
 };
+
+/***/ }),
+
+/***/ "./src/reducks/registerCollections.js":
+/*!********************************************!*\
+  !*** ./src/reducks/registerCollections.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _libs_shared__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../libs/shared */ "./src/libs/shared.js");
+
+ // Returns a hash of reducers to be passed into combineReducers like so:
+//  combineReducers({
+//    myOtherReducer,
+//    ...registerCollections({ users, posts })
+//  })
+
+/* harmony default export */ __webpack_exports__["default"] = ((...collections) => {
+  _libs_shared__WEBPACK_IMPORTED_MODULE_1__["default"].collections = collections;
+  const reducersHash = {};
+  collections.forEach(collection => {
+    // Error check
+    if (!collection.schema || !Object(lodash__WEBPACK_IMPORTED_MODULE_0__["isObject"])(collection.schema) || !collection.schema.collection) {
+      throw new TypeError('Collection#schema should be an object in the format { collection: "users", ... }. See docs for more options');
+    }
+
+    if (!collection.reducer || !Object(lodash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(collection.reducer)) {
+      throw new TypeError('Collection#reducer should be a function');
+    }
+
+    reducersHash[collection.schema.collection] = collection.reducer;
+  });
+  return reducersHash;
+});
 
 /***/ })
 

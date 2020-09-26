@@ -1,9 +1,11 @@
+import shared from '../libs/shared'
 import initReduxApiMiddleware from './initReduxApiMiddleware'
 import asyncDispatchMiddleware from './asyncDispatchMiddleware'
 
-const initReducksRailsMiddleware = function(apiConfig) {
+const initReducksRailsMiddleware = function(inConfig) {
+  shared.inConfig = inConfig
   return [
-    initReduxApiMiddleware(apiConfig),
+    initReduxApiMiddleware(inConfig),
     asyncDispatchMiddleware
   ]
 }

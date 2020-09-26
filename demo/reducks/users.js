@@ -24,7 +24,7 @@ class Users extends ReducksBaseCollection {
 
   reducer(state, action = {}) {
     if (!state) state = this.initialState
-    state = super.reducer(state, action, this.schema.collection)
+    state = super.reducer(state, action)
     switch (action.type) {
 
 

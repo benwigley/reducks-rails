@@ -97,38 +97,35 @@ export default class ReducksBaseCollection {
     return ids
   }
 
-  reducer(state, action = {}, collection) {
+  reducer(state, action = {}) {
     let finalStateBeforeOrdering
 
     switch (action.type) {
 
-
       // This action expects normalizedData to be a normalized
       // data object returned from the api middleware.
       case SET_ENTITIES:
-        if (!action.normalizedData[collection]) return state
-        logger.debug(`${SET_ENTITIES}:${collection}`, action.normalizedData[collection])
+        if (!action.normalizedData[this.schema.collection]) return state
+        logger.debug(`${SET_ENTITIES}:${this.schema.collection}`, action.normalizedData[this.schema.collection])
         finalStateBeforeOrdering = normalizedMerge(state, {
-          entities: action.normalizedData[collection].entities,
-          ids: action.normalizedData[collection].ids
+          entities: action.normalizedData[this.schema.collection].entities,
+          ids: action.normalizedData[this.schema.collection].ids
         })
         return {
           ...finalStateBeforeOrdering,
           ids: this.orderIds(finalStateBeforeOrdering.ids, finalStateBeforeOrdering.entities)
         }
 
-
       // This action expects normalizedData to be an
       // exact clone of the entire apps store object.
       case SET_ENTITIES_FROM_STORE:
-        if (!action.normalizedData[collection]) return state
-        logger.debug(`${SET_ENTITIES_FROM_STORE}:${collection}`, action.normalizedData[collection])
-        finalStateBeforeOrdering = normalizedMerge(state, action.normalizedData[collection])
+        if (!action.normalizedData[this.schema.collection]) return state
+        logger.debug(`${SET_ENTITIES_FROM_STORE}:${this.schema.collection}`, action.normalizedData[this.schema.collection])
+        finalStateBeforeOrdering = normalizedMerge(state, action.normalizedData[this.schema.collection])
         return {
           ...finalStateBeforeOrdering,
           ids: this.orderIds(finalStateBeforeOrdering.ids, finalStateBeforeOrdering.entities)
         }
-
 
     }
     return state
@@ -160,7 +157,7 @@ export default class ReducksBaseCollection {
         this.getCollectionSchema().nested.forEach(nestedSchema => {
           // Check if a relation exists
           if (action.payload.response[nestedSchema.key]) {
-            // It doesn, so find the schema for that relation
+            // It doesn't, so find the schema for that relation
             const relationsSchema = this.getMainSchema()[nestedSchema.collection]
             const normalizedData = normalize(action.payload.response[nestedSchema.key], relationsSchema, this.getMainSchema())
             action.asyncDispatch(setEntities(normalizedData))
