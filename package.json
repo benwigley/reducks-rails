@@ -6,8 +6,8 @@
   "scripts": {
     "start": "webpack --env.development --progress --watch --config webpack.config.js",
     "build": "npm test && webpack --env.production --progress --config webpack.config.js",
-    "test": "jest --coverage --silent",
-    "test:watch": "npm test -- --watch --bail"
+    "test": "jest",
+    "test:watch": "npm test -- --watch --bail --onlyChanged"
   },
   "keywords": [
     "redux",

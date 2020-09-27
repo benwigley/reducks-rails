@@ -8,18 +8,18 @@ import { cloneDeep, mergeWith, isArray, union } from 'lodash'
 // Example:
 // Object1 (existingState)
 // {
-//    entities: { 1: {name: 'One'}, 2: {name: 'Two'} }
+//    entities: { 1: {name: 'One'}, 2: {name: 'Two'} },
 //    ids: [1, 2]
 // }
 // Object2 (newState)
 // {
-//    entities: { 2: {name: 'Two'}, 3: {name: 'Three'} }
+//    entities: { 2: {name: 'Two'}, 3: {name: 'Three'} },
 //    ids: [2, 3]
 // }
 //
 // Result:
 // {
-//    entities: { 1: {name: 'One'}, 2: {name: 'Two'}, 3: {name: 'Three'} }
+//    entities: { 1: {name: 'One'}, 2: {name: 'Two'}, 3: {name: 'Three'} },
 //    ids: [1, 2, 3]
 // }
 //

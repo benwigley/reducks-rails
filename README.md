@@ -9,10 +9,10 @@ Connect your app to Rails with Redux using the Reducks methodology.
 
 const schema = {
   users: {
-    collection: 'users',
+    collection: 'users',      // 'collection' required for base collections
     nested: [{
-      key: 'avatar',
-      collection: 'avatars',
+      key: 'avatar',          // 'key' is required for nested schemas only
+      collection: 'avatars',  // 'collection' is required for nested schemas
     }]
   },
   posts: {

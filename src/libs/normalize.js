@@ -1,6 +1,6 @@
 import normalizedMerge from './normalizedMerge'
 import pluralize from 'pluralize'
-import { map, keyBy, isArray, cloneDeep, unionWith } from 'lodash'
+import { map, keyBy, isArray, cloneDeep, unionWith, isObject, isNil } from 'lodash'
 import logger from './logger'
 
 let count
@@ -37,7 +37,7 @@ function processNestedCollections(withSchema, entitiesArray, baseCollectionsLook
     if (!baseCollectionsLookup[nestedSchema.collection]) baseCollectionsLookup[nestedSchema.collection] = {}
     for (let index = 0; index < entitiesArray.length; index++) {
       // Soft fallback to ignore the schema
-      if (typeof entitiesArray[index][nestedSchema.key] === 'undefined') {
+      if (isNil(entitiesArray[index][nestedSchema.key])) {
         if (hardFail) {
           throw new Error(`Normalize: Nested item '${nestedSchema.key}' doesn't exist`)
         } else {
@@ -79,7 +79,28 @@ function processNestedCollections(withSchema, entitiesArray, baseCollectionsLook
 // Public utility function
 // This can handle the baseEntitiesArray being a baseEntity"Object" too.
 export default function normalize(baseEntitiesArray, baseSchema, mainSchema) {
+  if (typeof baseEntitiesArray == 'undefined') {
+    throw new TypeError(`#normalize expected first argument to be type Array|Object, but got type: ${typeof baseEntitiesArray}`)
+  }
+  if (!isObject(baseSchema)) {
+    throw new TypeError(`#normalize expected second argument to be an Object, but got type: ${typeof baseSchema}`)
+  }
+  if (typeof baseSchema.collection !== 'string') {
+    throw new TypeError(`#normalize expected second argument to be a ReducksRails:schema object, e.g. { key: 'users', collection: 'users' }`)
+  }
+  if (!isObject(mainSchema)) {
+    throw new TypeError(`#normalize expected third argument to be an Object, but got type: ${typeof mainSchema}`)
+  }
+  if (typeof mainSchema[baseSchema.collection] !== 'object') {
+    throw new TypeError(`#normalize expected third argument to be a ReducksRails:schema object, e.g. { key: 'users', collection: 'users' }, but schema object '${baseSchema.collection}' not found on schema`)
+  }
+
+  // For counting how many layers deep we dive (debugging only)
   count = 0
+
+  // This is the base collection lookup, in the format:
+  // { recipeItems: { entities, ids }, recipeProjects, { entities, ids }, ... }
+  let baseCollectionsLookup = {}
 
   let clonedBaseEntitiesArray = cloneDeep(baseEntitiesArray)
   if (baseSchema.key && clonedBaseEntitiesArray[baseSchema.key]) {
@@ -88,10 +109,6 @@ export default function normalize(baseEntitiesArray, baseSchema, mainSchema) {
   if (!isArray(clonedBaseEntitiesArray)) {
     clonedBaseEntitiesArray = [clonedBaseEntitiesArray]
   }
-
-  // This is the base collection lookup, in the format:
-  // { recipeItems: { entities, ids }, recipeProjects, { entities, ids }, ... }
-  let baseCollectionsLookup = {}
 
   if (baseSchema.nested) {
     // logger.debug('Normalize: baseSchema.nested', baseSchema.nested)
