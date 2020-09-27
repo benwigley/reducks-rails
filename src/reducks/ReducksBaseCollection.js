@@ -1,7 +1,7 @@
 import logger from '../libs/logger'
-import normalize from '../libs/normalize.ts'
+import normalize from '../libs/normalize'
 import actionTypeModifiers from '../libs/actionTypeModifiers'
-import normalizedMerge from '../libs/normalizedMerge.ts'
+import normalizedMerge from '../libs/normalizedMerge'
 import { sortBy, isArray } from 'lodash'
 
 //

@@ -1,6 +1,5 @@
+// import logger from './logger'
 import { cloneDeep, mergeWith, isArray, union } from 'lodash'
-import logger from './logger'
-import Collection from '../reducks/CollectionInterface'
 
 // Merges two objects together
 // Aids in concatenating two reducks Collections together so
@@ -24,20 +23,8 @@ import Collection from '../reducks/CollectionInterface'
 //    ids: [1, 2, 3]
 // }
 //
-export default function normalizedMerge(existingState: Collection, newState: Collection, shouldLog: boolean = false): Collection {
-  if (shouldLog) {
-    logger.debug('-----------')
-    logger.debug('normalizedMerge')
-    logger.debug('existingState', existingState)
-    logger.debug('newState', newState)
-  }
-  return mergeWith(cloneDeep(existingState), newState, function (existingStateProperty, newStateProperty, statePropertyKey) {
-    if (shouldLog) {
-      logger.debug('statePropertyKey', statePropertyKey)
-      logger.debug('existingStateProperty', existingStateProperty)
-      logger.debug('newStateProperty', newStateProperty)
-      logger.debug('-----------')
-    }
+export function normalizedMerge(existingState, newState) {
+  return mergeWith(cloneDeep(existingState), newState, (existingStateProperty, newStateProperty, statePropertyKey) => {
 
     // The 'ids' properties of state should be merge together, not replaced.
     if (statePropertyKey === 'ids' && isArray(existingStateProperty)) {
@@ -52,16 +39,11 @@ export default function normalizedMerge(existingState: Collection, newState: Col
     else if (statePropertyKey === 'entities') {
       // Go one step deeper to avoid entities id lookup arrays being replaced
       // e.g. recipePhaseIds, recipeItemTimeTrackerIds
-      return mergeWith(existingStateProperty, newStateProperty, function (existingEntityProperty, newEntityProperty, entityPropertyKey) {
-        if (entityPropertyKey.substr(entityPropertyKey.length - 3) == 'Ids') {
-          // console.log("=================")
-          // console.log('entityPropertyKey', entityPropertyKey)
-          // console.log('existingEntityProperty', existingEntityProperty)
-          // console.log('newEntityProperty', newEntityProperty)
-          // console.log("=================")
-        }
+      return mergeWith(existingStateProperty, newStateProperty, (existingEntityProperty, newEntityProperty, entityPropertyKey) => {
         if (entityPropertyKey.substr(entityPropertyKey.length - 3) == 'Ids' && isArray(existingEntityProperty)) {
-          if (isArray(newEntityProperty)) return union(existingEntityProperty.concat(newEntityProperty))
+          if (isArray(newEntityProperty)) {
+            return union(existingEntityProperty.concat(newEntityProperty))
+          }
           return existingEntityProperty
         }
       })
@@ -74,3 +56,5 @@ export default function normalizedMerge(existingState: Collection, newState: Col
     }
   })
 }
+
+export default normalizedMerge

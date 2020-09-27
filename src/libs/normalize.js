@@ -1,23 +1,21 @@
-import normalizedMerge from './normalizedMerge.ts'
+import normalizedMerge from './normalizedMerge'
 import pluralize from 'pluralize'
 import { map, keyBy, isArray, cloneDeep, unionWith } from 'lodash'
-import CollectionsLookup from '../reducks/CollectionsLookupInterface'
-import Schema from '../reducks/SchemaInterface'
-import Entity from '../reducks/EntityInterface'
 import logger from './logger'
-let count: number
+
+let count
 
 
 // Check the schema for any nested collections that we haven't been
 // normalized/processed by checking the mainSchema and merging them in.
 // This allows us to specify only one level deep of nesting in our mainSchema
-function hydrateSchema(schema: Schema, mainSchema: CollectionsLookup): Schema {
+function hydrateSchema(schema, mainSchema) {
   if (mainSchema[schema.collection] && mainSchema[schema.collection].nested) {
     // if (!isArray(schemaForCollection)) {
     //   schemaForCollection = [schemaForCollection]
     // }
     // `unionWith` prevents duplicates in the array
-    schema.nested = unionWith(schema.nested, mainSchema[schema.collection].nested, (schemaA: Schema, schemaB: Schema) => {
+    schema.nested = unionWith(schema.nested, mainSchema[schema.collection].nested, (schemaA, schemaB) => {
       return schemaA.key === schemaB.key
     })
     return schema
@@ -26,16 +24,16 @@ function hydrateSchema(schema: Schema, mainSchema: CollectionsLookup): Schema {
 }
 
 // Recursive functon to deep-process nested objects into a normalized format of { entities, ids }
-function processNestedCollections(withSchema: Schema, entitiesArray: Entity[], baseCollectionsLookup: CollectionsLookup, mainSchema: CollectionsLookup, hardFail: boolean = false): void {
+function processNestedCollections(withSchema, entitiesArray, baseCollectionsLookup, mainSchema, hardFail = false) {
   count += 1
   let schema = cloneDeep(withSchema)
-  if (!schema.collection) throw new Error(`Normalize: schema.collection must exist`)
+  if (!schema.collection) throw new Error(`Normalize.collection must exist`)
   if (!schema.key) schema.key = schema.collection
   if (!isArray(schema.nested)) {
     schema.nested = [schema.nested]
   }
   hydrateSchema(schema, mainSchema)
-  schema.nested.forEach((nestedSchema: Schema) => {
+  schema.nested.forEach((nestedSchema) => {
     if (!baseCollectionsLookup[nestedSchema.collection]) baseCollectionsLookup[nestedSchema.collection] = {}
     for (let index = 0; index < entitiesArray.length; index++) {
       // Soft fallback to ignore the schema
@@ -48,7 +46,7 @@ function processNestedCollections(withSchema: Schema, entitiesArray: Entity[], b
           entitiesArray[index][`${pluralize.singular(nestedSchema.key)}Ids`] = []
         }
       } else {
-        const isNestedItemAnArray: boolean = isArray(entitiesArray[index][nestedSchema.key])
+        const isNestedItemAnArray = isArray(entitiesArray[index][nestedSchema.key])
         const nestedSchemasArray = isNestedItemAnArray ? entitiesArray[index][nestedSchema.key] : [entitiesArray[index][nestedSchema.key]]
 
         // Recursive Call For Deeply Nested Entities
@@ -69,7 +67,7 @@ function processNestedCollections(withSchema: Schema, entitiesArray: Entity[], b
         // Clean Up
         // Replace the nested collection with a list of ids
         if (isNestedItemAnArray) {
-          entitiesArray[index][`${pluralize.singular(nestedSchema.key)}Ids`] = map(nestedSchemasArray, (e: Entity) => e.id)
+          entitiesArray[index][`${pluralize.singular(nestedSchema.key)}Ids`] = map(nestedSchemasArray, (e) => e.id)
         }
         entitiesArray[index][`${nestedSchema.key}Fetched`] = true
         delete entitiesArray[index][nestedSchema.key]
@@ -80,7 +78,7 @@ function processNestedCollections(withSchema: Schema, entitiesArray: Entity[], b
 
 // Public utility function
 // This can handle the baseEntitiesArray being a baseEntity"Object" too.
-export default function normalize(baseEntitiesArray: Entity[], baseSchema: Schema, mainSchema: CollectionsLookup): CollectionsLookup {
+export default function normalize(baseEntitiesArray, baseSchema, mainSchema) {
   count = 0
 
   let clonedBaseEntitiesArray = cloneDeep(baseEntitiesArray)
@@ -93,7 +91,7 @@ export default function normalize(baseEntitiesArray: Entity[], baseSchema: Schem
 
   // This is the base collection lookup, in the format:
   // { recipeItems: { entities, ids }, recipeProjects, { entities, ids }, ... }
-  let baseCollectionsLookup: CollectionsLookup = {}
+  let baseCollectionsLookup = {}
 
   if (baseSchema.nested) {
     // logger.debug('Normalize: baseSchema.nested', baseSchema.nested)

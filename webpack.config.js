@@ -18,7 +18,7 @@ module.exports = env => {
     module: {
       rules: [
         {
-          test: /\.(js|ts)$/,
+          test: /\.js$/,
           loaders: ['babel-loader'],
           exclude: /node_modules/,
         }

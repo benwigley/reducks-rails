@@ -6,7 +6,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|ts|jsx)$/,
+        test: /\.(js|jsx)$/,
         loader: ["babel-loader"],
         exclude: /node_modules/,
       }
@@ -23,12 +23,10 @@ module.exports = {
   resolve: {
     alias: {
       "reducks-rails": path.resolve(
-        // Ideally we want to use the original source code, but
-        // I didn't figure out how to make it load typescript
-        // path.join(__dirname, "..", "src", "index.js")
-        path.join(__dirname, "..", "dist", "reducks-rails.js")
+        path.join(__dirname, "..", "src", "index.js")
+        // path.join(__dirname, "..", "dist", "reducks-rails.js")
       )
     },
-    // extensions: [".js", ".jsx", ".ts"]
+    extensions: [".js", ".jsx"]
   },
 }

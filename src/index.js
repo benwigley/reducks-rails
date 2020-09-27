@@ -1,5 +1,5 @@
-import normalize from './libs/normalize.ts'
-import normalizedMerge from './libs/normalizedMerge.ts'
+import normalize from './libs/normalize'
+import normalizedMerge from './libs/normalizedMerge'
 import actionTypeModifiers from './libs/actionTypeModifiers'
 import registerCollections from './reducks/registerCollections'
 import {
