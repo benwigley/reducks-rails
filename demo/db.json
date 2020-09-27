@@ -88,29 +88,46 @@
       "title": "foo",
       "body": "bar",
       "userId": 66,
-      "id": 138
+      "id": 138,
+      "comments": [
+        {
+          "id": 56,
+          "postId": 138,
+          "text": "This is a nested comment 15"
+        },
+        {
+          "id": 67,
+          "postId": 138,
+          "text": "Hey, I'm a post's comment"
+        }
+      ]
     }
   ],
   "comments": [
     {
       "id": 15,
-      "text": "This is coment 15"
+      "postId": 134,
+      "text": "This is comment 15"
     },
     {
       "id": 42,
+      "postId": 134,
       "text": "Hello"
     },
     {
       "id": 43,
+      "postId": 134,
       "text": "Hi!"
     },
     {
       "id": 44,
-      "text": "Is that all you really have to say after what you've done?"
+      "postId": 135,
+      "text": "Hey Buddy"
     },
     {
       "id": 45,
-      "text": "...I just met you, like, three minutes ago."
+      "postId": 135,
+      "text": "Hope you find your Dad"
     }
   ],
   "photos": [

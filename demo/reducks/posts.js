@@ -1,5 +1,5 @@
 import { ReducksBaseCollection } from 'reducks-rails'
-import reducksSchemas from './schemas'
+import mainSchema from './schema'
 
 // Types
 export const DELETE_POST = '<app-namespace>/posts/DELETE_POST'
@@ -12,8 +12,8 @@ class Posts extends ReducksBaseCollection {
     super()
 
     // Set required properties
-    this.schema = reducksSchemas.posts
-    this.mainSchema = reducksSchemas
+    this.schema = mainSchema.posts
+    this.mainSchema = mainSchema
 
     this.initialState = {
       ...this.initialState,     // important to keep the initial state from the ReducksBaseCollection

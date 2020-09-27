@@ -1,5 +1,5 @@
 import { ReducksBaseCollection } from 'reducks-rails'
-import reducksSchemas from './schemas'
+import mainSchema from './schema'
 
 
 // Types
@@ -13,8 +13,8 @@ class Users extends ReducksBaseCollection {
     super()
 
     // Set required properties
-    this.schema = reducksSchemas.users
-    this.mainSchema = reducksSchemas
+    this.schema = mainSchema.users
+    this.mainSchema = mainSchema
 
     this.initialState = {
       ...this.initialState,

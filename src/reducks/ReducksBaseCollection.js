@@ -105,6 +105,14 @@ export class ReducksBaseCollection {
   reducer(state, action = {}) {
     let finalStateBeforeOrdering
 
+    if (!state) {
+      // Default state
+      state = {
+        entities: {},
+        ids: [],
+      }
+    }
+
     switch (action.type) {
 
       // This action expects normalizedData to be a normalized

@@ -9,6 +9,7 @@ import {
 // Reducers
 import users from './reducks/users'
 import posts from './reducks/posts'
+import comments from './reducks/comments'
 
 // This would be your actual node session
 const sessionStorage = {}
@@ -66,7 +67,7 @@ export default (initialState = {}) => {
   return createStore(
     combineReducers({
       // reducerName: myOtherReducer
-      ...registerCollections(users, posts)
+      ...registerCollections(users, posts, comments)
     }),
     initialState,
     compose(applyMiddleware(
