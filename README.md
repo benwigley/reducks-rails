@@ -86,7 +86,7 @@ store = createStore(
 )
 
 // Example REST api calls
-store.dispatch(avatars.index()).then((data) => {
+store.dispatch(avatars.index(), { page: 2 }).then((data) => {
   console.log({ data });
 })
 store.dispatch(avatars.create({ name: 'foo', email: 'foor@bar.com', password: 'mySecret' })))
@@ -102,8 +102,14 @@ Things to cover
 * Extending `ReducksBaseCollection`, full options
 * Explaining full configuration options
 * Showing a React example
+* Show examples of using `entitySelectors.where|map|filter()`
+* Show examples of custom a reducer
+* Cover loading states: isLoading, isLoadingIndex, isCreatingEntity, isFetchingEntityId, isDeletingEntityId
 
 
 ## Project todo
 
 * Remove thunk dependency based on [redux-rails](https://github.com/instacart/redux-rails)
+* Potentially add a way to create singular Resources
+  * e.g. CurrentUser vs Users to fetch the authenticaed user
+  * For now maybe some docs on how to implement a custom example such as currentUser in the Users collection

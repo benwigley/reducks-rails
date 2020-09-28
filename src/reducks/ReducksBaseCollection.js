@@ -5,28 +5,19 @@ import normalizedMerge from '../libs/normalizedMerge'
 import { sortBy, isArray } from 'lodash'
 
 //
-// Redux Ducks guidelines:
+// ReducksBaseCollection guidelines:
 //
-// Each ducks file must:
-// - MUST export default a function called reducer()
-// - MUST export its action creators as functions
-// - MUST have action types in the form `npm-module-or-app/reducer/ACTION_TYPE`
-// - MAY export its action types as UPPER_SNAKE_CASE, if an external reducer
-//   needs to listen for them, or if it is a published reusable library.
+// Each inheriting class must:
+// - MUST define a schema property in it's contructor, usually mainSchema.<collectionName>
+// - MUST define a mainSchema property in it's contructor
 //
-
-
-// Note:
-// Redux-ORM looks like a library that has already done much of what I'm doing.
-// I like my simple approach, but if I want ideas, check that lib out.
-// https://github.com/redux-orm/redux-orm
 
 
 // Types
 export const SET_ENTITIES             = 'reducksRails/entities/SET_ENTITIES'
 export const SET_ENTITIES_FROM_STATE  = 'tjmer/entities/SET_ENTITIES_FROM_STATE'
 
-// Action Creators
+// Global Action Creators
 export function setEntities(normalizedData) {
   return {
     type: SET_ENTITIES,
@@ -41,11 +32,19 @@ export function setEntitiesFromState(state) {
   }
 }
 
+// REST Action Types
+const INDEX   = 'INDEX'
+const SHOW    = 'SHOW'
+const CREATE  = 'CREATE'
+const UPDATE  = 'UPDATE'
+const DESTROY = 'DESTROY'
+
+
 export class ReducksBaseCollection {
 
   constructor() {
 
-    // IMPORTANT These must be overriden!
+    // IMPORTANT These must be overriden by child classes!
     this.schema = null
     this.mainSchema = null // '{ users: { collection: 'users', etc... } }'
 
@@ -57,6 +56,7 @@ export class ReducksBaseCollection {
     //          e.g. () => {}
     //          It breaks things for some reason.
     this.reducer = this.reducer.bind(this)
+    this.processApiRequest = this.processApiRequest.bind(this)
     this.processApiSuccess = this.processApiSuccess.bind(this)
     this.processApiFailure = this.processApiFailure.bind(this)
 
@@ -103,6 +103,8 @@ export class ReducksBaseCollection {
   }
 
   reducer(state, action = {}) {
+    if (!state) { state = this.initialState }
+
     let finalStateBeforeOrdering
 
     if (!state) {
@@ -141,8 +143,112 @@ export class ReducksBaseCollection {
           ids: this.orderIds(finalStateBeforeOrdering.ids, finalStateBeforeOrdering.entities)
         }
 
+      //
+      // Default REST Resource Actions
+      //
+
+      // POST /:collectionName
+      case this.requestTypeModifier(`${this.getCollection()}.${INDEX}`):
+        console.log(`Reducer#${this.getCollection()}, INDEX request`);
+        return this.processApiRequest({
+          state: { ...state, isLoadingIndex: true },
+          action
+        })
+      case this.successTypeModifier(`${this.getCollection()}.${INDEX}`):
+        return this.processApiSuccess({
+          state: { ...state, isLoadingIndex: false },
+          action
+        })
+      case this.failureTypeModifier(`${this.getCollection()}.${INDEX}`):
+        return this.processApiFailure({
+          state: { ...state, isLoadingIndex: false },
+          action
+        })
+
+      // POST /:collectionName
+      case this.requestTypeModifier(`${this.getCollection()}.${CREATE}`):
+        console.log(`Reducer#${this.getCollection()}, CREATE request`);
+        return this.processApiRequest({
+          state: { ...state, isCreatingEntity: action.data },
+          action
+        })
+      case this.successTypeModifier(`${this.getCollection()}.${CREATE}`):
+        return this.processApiSuccess({
+          state: { ...state, isCreatingEntity: null },
+          action
+        })
+      case this.failureTypeModifier(`${this.getCollection()}.${CREATE}`):
+        return this.processApiFailure({
+          state: { ...state, isCreatingEntity: null },
+          action
+        })
+
+      // GET /:collectionName/:id
+      case this.requestTypeModifier(`${this.getCollection()}.${SHOW}`):
+        console.log(`Reducer#${this.getCollection()}, SHOW request`);
+        return this.processApiRequest({
+          state: { ...state, isFetchingEntityId: action.id },
+          action
+        })
+      case this.successTypeModifier(`${this.getCollection()}.${SHOW}`):
+        return this.processApiSuccess({
+          state: { ...state, isFetchingEntityId: null },
+          action
+        })
+      case this.failureTypeModifier(`${this.getCollection()}.${SHOW}`):
+        return this.processApiFailure({
+          state: { ...state, isFetchingEntityId: null },
+          action
+        })
+
+      // PUT /:collectionName/:id
+      case this.requestTypeModifier(`${this.getCollection()}.${UPDATE}`):
+        console.log(`Reducer#${this.getCollection()}, UPDATE request`);
+        return this.processApiRequest({
+          state: { ...state, isUpdatingEntityId: action.id },
+          action
+        })
+      case this.successTypeModifier(`${this.getCollection()}.${UPDATE}`):
+        return this.processApiSuccess({
+          state: { ...state, isUpdatingEntityId: null },
+          action,
+          // Example of transforming the final state returned from this.processApiSuccess
+          // dataTransformer: (normalizedData, newState) => {
+          //   newState.thing = action.payload.thing
+          //   return newState
+          // }
+        })
+      case this.failureTypeModifier(`${this.getCollection()}.${UPDATE}`):
+        return this.processApiFailure({
+          state: { ...state, isUpdatingEntityId: null },
+          action
+        })
+
+      // DELETE /:collectionName/:id
+      case this.requestTypeModifier(`${this.getCollection()}.${DESTROY}`):
+        console.log(`Reducer#${this.getCollection()}, DESTROY request`);
+        return this.processApiRequest({
+          state: { ...state, isDeletingEntityId: action.id },
+          action
+        })
+      case this.successTypeModifier(`${this.getCollection()}.${DESTROY}`):
+        return this.processApiSuccess({
+          state: { ...this.removeEntityById(state, action.id), isDeletingEntityId: null },
+          action
+        })
+      case this.failureTypeModifier(`${this.getCollection()}.${DESTROY}`):
+        return this.processApiFailure({
+          state: { ...state, isDeletingEntityId: null },
+          action
+        })
+
     }
     return state
+  }
+
+  processApiRequest({ state, action }) {
+    logger.log(`ReducksBaseCollection:${this.constructor.name}:processApiRequest`)
+    return { ...state, isLoading: true }
   }
 
   processApiSuccess({ state, action, dataTransformer }) {
@@ -154,7 +260,10 @@ export class ReducksBaseCollection {
       isLoading: false,
       lastRequestSuccesful: true,
       errors: [],
-      metaData: action.payload.metaData,
+      metaData: {
+        ...state.metaData,
+        ...action.payload.metaData
+      },
     }
 
     if (!action.payload.response) {
@@ -221,10 +330,8 @@ export class ReducksBaseCollection {
     let updatedIds = []
     state.ids.forEach((id) => {
       const entity = { ...state.entities[id] }
-      if (entityIdsToDelete.includes(id)) {
-        // The entity is to be deleted, so skip it
-        return
-      }
+      // The entity is to be deleted, so skip it by returning
+      if (entityIdsToDelete.includes(id)) { return }
       // Add all other entities
       updatedEntities[id] = entity
       updatedIds.push(id)
@@ -236,29 +343,69 @@ export class ReducksBaseCollection {
     }
   }
 
-  // fetchSomething() {
-  //   return (dispatch, getState) => {
-  //     // const state = getState()
-  //     return dispatch({
-  //       type: FETCH_SOMETHING,
-  //       api: {
-  //         method: 'GET',
-  //         url: 'something',
-  //         data: {},
-  //         params: {}
-  //       }
-  //     })
-  //   }
-  // }
+  // REST Actions
+  index(queryParams={}) {
+    return {
+      type: `${this.getCollection()}.${INDEX}`,
+      api: {
+        method: 'GET',
+        url: `${this.getCollection()}`,
+        params: queryParams
+      }
+    }
+  }
+  create(attributes) {
+    return {
+      type: `${this.getCollection()}.${CREATE}`,
+      api: {
+        method: 'POST',
+        url: `${this.getCollection()}`,
+        data: attributes
+      }
+    }
+  }
+  show(id, queryParams) {
+    return {
+      type: `${this.getCollection()}.${SHOW}`,
+      api: {
+        method: 'GET',
+        url: `${this.getCollection()}/${id}`,
+        params: queryParams
+      }
+    }
+  }
+  update(id, attributes) {
+    return {
+      type: `${this.getCollection()}.${UPDATE}`,
+      api: {
+        method: 'PUT',
+        url: `${this.getCollection()}/${id}`,
+        data: attributes
+      }
+    }
+  }
+  destroy(id) {
+    return {
+      type: `${this.getCollection()}.${DESTROY}`,
+      api: {
+        method: 'DELETE',
+        url: `${this.getCollection()}/${id}`
+      }
+    }
+  }
 }
 
 ReducksBaseCollection.prototype.initialState = {
   // Api Fetching states
   isLoading: false,
+  isLoadingIndex: false,
+  isCreatingEntity: null,
+  isFetchingEntityId: null,
+  isDeletingEntityId: null,
   lastRequestSuccesful: null,
   errors: [],
   ids: [],
-  entities: {}
+  entities: {},
 }
 
 export default ReducksBaseCollection

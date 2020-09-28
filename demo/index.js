@@ -5,6 +5,6 @@ const initialState = {}
 
 const store = createStore(initialState)
 
-store.dispatch(postsCollection.fetchPosts()).then(function(res) {
+store.dispatch(postsCollection.index()).then(function(res) {
   console.log('Fetching of posts finished');
 })

@@ -2,8 +2,6 @@ import { ReducksBaseCollection } from 'reducks-rails'
 import mainSchema from './schema'
 
 // Types
-export const DELETE_POST = '<app-namespace>/posts/DELETE_POST'
-export const FETCH_POSTS = '<app-namespace>/posts/FETCH_POSTS'
 export const FETCH_CURRENT_USER_POSTS = '<app-namespace>/posts/FETCH_CURRENT_USER_POSTS'
 
 // Reducks class
@@ -18,33 +16,26 @@ class Posts extends ReducksBaseCollection {
     this.initialState = {
       ...this.initialState,     // important to keep the initial state from the ReducksBaseCollection
       currentUsersPostIds: [],  // manually keep track of the current users posts
-      isCreatingProject: null,
-      isDeletingProjectId: null,
     }
   }
 
-  // Every Reducks Collection requires a reducer
   reducer(state, action = {}) {
-    if (!state) state = this.initialState
-    state = super.reducer(state, action)
-    switch (action.type) {
 
-      // Rails: PostsController#posts
-      case this.requestTypeModifier(FETCH_POSTS):
-        return { ...state, isLoading: true }
-      case this.successTypeModifier(FETCH_POSTS):
-        return this.processApiSuccess({ state, action })
-      case this.failureTypeModifier(FETCH_POSTS):
-        return this.processApiFailure({ state, action })
+    // Required: a custom reducer must always call the parent reducer
+    state = super.reducer(state, action)
+
+    switch (action.type) {
 
       // Rails: PostsController#current_user_posts
       case this.requestTypeModifier(FETCH_CURRENT_USER_POSTS):
-        return { ...state, isLoading: true }
+        return this.processApiRequest({ state })
       case this.successTypeModifier(FETCH_CURRENT_USER_POSTS):
         return this.processApiSuccess({
           state,
           action,
           dataTransformer: (normalizedData, newState) => {
+            // Posts will have gone into the state normlaized as {entities, ids}, but
+            // let's keep a record of which posts in state are the current user's posts
             newState.currentUsersPostIds = normalizedData[this.schema.collection].ids
             return newState
           }
@@ -52,51 +43,11 @@ class Posts extends ReducksBaseCollection {
       case this.failureTypeModifier(FETCH_CURRENT_USER_POSTS):
         return this.processApiFailure({ state, action })
 
-
-      // Rails: PostsController#destroy
-      case this.requestTypeModifier(DELETE_POST):
-        return {
-          ...state,
-          isDeletingPostId: action.postId,
-        }
-      case this.successTypeModifier(DELETE_POST):
-        return this.processApiSuccess({
-          state: {
-            ...this.removeEntityById(state, action.postId),
-            currentUsersPostIds: without(state.currentUsersPostIds, action.postId),
-            isDeletingProjectId: null
-          },
-          action
-        })
-      case this.failureTypeModifier(DELETE_POST):
-        return this.processApiFailure({
-          state: {
-            ...state,
-            isDeletingProjectId: null
-          },
-          action
-        })
-
     }
     return state
   }
 
-  // Actions below are using the "thunk" based format
-
-  fetchPosts(userId) {
-    return (dispatch, getState) => {
-      // const state = getState()
-      return dispatch({
-        type: FETCH_POSTS,
-        api: {
-          method: 'GET',
-          url: 'posts',
-          data: {},
-          params: { }
-        }
-      })
-    }
-  }
+  // Custom Actions
 
   fetchCurrentUserPosts(userId) {
     return (dispatch, getState) => {
@@ -106,24 +57,9 @@ class Posts extends ReducksBaseCollection {
         api: {
           method: 'GET',
           url: 'current_user_posts',
-          data: {},
-          params: { }
+          data: {},   // ajax data
+          params: {}  // queryParams
         }
-      })
-    }
-  }
-
-  deletePost(postId) {
-    return (dispatch) => {
-      return dispatch({
-        type: DELETE_POST,
-        api: {
-          method: 'DELETE',
-          url: `recipe_projects/${postId}`,
-          data: {},
-          params: {}
-        },
-        postId
       })
     }
   }
