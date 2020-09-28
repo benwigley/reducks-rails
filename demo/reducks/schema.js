@@ -2,6 +2,7 @@ export default {
 
   users: {
     collection: 'users',
+    controllerUrl: 'users', // optional, e.g. A collection named 'userPosts' > 'user_posts'
     nested: [{
       key: 'avatar', // singular, we will look for an object not an array
       collection: 'avatars',

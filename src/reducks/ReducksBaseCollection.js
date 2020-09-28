@@ -70,6 +70,12 @@ export class ReducksBaseCollection {
     return this.getCollectionSchema().collection
   }
 
+  getControllerUrl() {
+    // TODO: If we have access to reducksConfig in future,
+    //       use a snakeCaseCollectionUrl: <bool> option
+    return this.schema.controllerUrl || this.getCollectionSchema().getCollectionSchema
+  }
+
   getCollectionSchema() {
     // Validate that the schema has been set,
     // that is is an object, and that it has
@@ -149,7 +155,6 @@ export class ReducksBaseCollection {
 
       // POST /:collectionName
       case this.requestTypeModifier(`${this.getCollection()}.${INDEX}`):
-        console.log(`Reducer#${this.getCollection()}, INDEX request`);
         return this.processApiRequest({
           state: { ...state, isLoadingIndex: true },
           action
@@ -167,7 +172,6 @@ export class ReducksBaseCollection {
 
       // POST /:collectionName
       case this.requestTypeModifier(`${this.getCollection()}.${CREATE}`):
-        console.log(`Reducer#${this.getCollection()}, CREATE request`);
         return this.processApiRequest({
           state: { ...state, isCreatingEntity: action.data },
           action
@@ -185,7 +189,6 @@ export class ReducksBaseCollection {
 
       // GET /:collectionName/:id
       case this.requestTypeModifier(`${this.getCollection()}.${SHOW}`):
-        console.log(`Reducer#${this.getCollection()}, SHOW request`);
         return this.processApiRequest({
           state: { ...state, isFetchingEntityId: action.id },
           action
@@ -203,7 +206,6 @@ export class ReducksBaseCollection {
 
       // PUT /:collectionName/:id
       case this.requestTypeModifier(`${this.getCollection()}.${UPDATE}`):
-        console.log(`Reducer#${this.getCollection()}, UPDATE request`);
         return this.processApiRequest({
           state: { ...state, isUpdatingEntityId: action.id },
           action
@@ -226,7 +228,6 @@ export class ReducksBaseCollection {
 
       // DELETE /:collectionName/:id
       case this.requestTypeModifier(`${this.getCollection()}.${DESTROY}`):
-        console.log(`Reducer#${this.getCollection()}, DESTROY request`);
         return this.processApiRequest({
           state: { ...state, isDeletingEntityId: action.id },
           action
@@ -266,32 +267,33 @@ export class ReducksBaseCollection {
       },
     }
 
-    if (!action.payload.response) {
-      return returnState
-    }
+    // No response, no worries, exit early
+    if (!action.payload.data) { return returnState }
 
+    // TODO: Is this block here really neccessary?
+    //       I can't think of a scenario that would
+    //       require it. I mean it's possible, but you
+    //       could probably handle those cases manually.
     // Handle destroy requests where no base entity or collection
     // is returned, but other nested items are present in the payload
-    if (!action.payload.response.id && !isArray(action.payload.response)) {
-
+    if (!action.payload.data.id && !isArray(action.payload.data)) {
       // An entity was probably deleted, but there might be other
       // models or collections of models, so check before continuing.
-      if (action.payload.response && isArray(this.getCollectionSchema().nested)) {
+      if (action.payload.data && isArray(this.getCollectionSchema().nested)) {
         this.getCollectionSchema().nested.forEach(nestedSchema => {
           // Check if a relation exists
-          if (action.payload.response[nestedSchema.key]) {
+          if (action.payload.data[nestedSchema.key]) {
             // It doesn't, so find the schema for that relation
             const relationsSchema = this.getMainSchema()[nestedSchema.collection]
-            const normalizedData = normalize(action.payload.response[nestedSchema.key], relationsSchema, this.getMainSchema())
+            const normalizedData = normalize(action.payload.data[nestedSchema.key], relationsSchema, this.getMainSchema())
             action.asyncDispatch(setEntities(normalizedData))
           }
         })
       }
-
       return returnState
     }
 
-    const normalizedData = normalize(action.payload.response, this.getCollectionSchema(), this.getMainSchema())
+    const normalizedData = normalize(action.payload.data, this.getCollectionSchema(), this.getMainSchema())
     action.asyncDispatch(setEntities(normalizedData))
     // Fist, merge the newState into the old state
     let newState = normalizedMerge(state, {
@@ -346,50 +348,50 @@ export class ReducksBaseCollection {
   // REST Actions
   index(queryParams={}) {
     return {
-      type: `${this.getCollection()}.${INDEX}`,
+      type: `${this.getControllerUrl()}.${INDEX}`,
       api: {
         method: 'GET',
-        url: `${this.getCollection()}`,
+        url: `${this.getControllerUrl()}`,
         params: queryParams
       }
     }
   }
   create(attributes) {
     return {
-      type: `${this.getCollection()}.${CREATE}`,
+      type: `${this.getControllerUrl()}.${CREATE}`,
       api: {
         method: 'POST',
-        url: `${this.getCollection()}`,
+        url: `${this.getControllerUrl()}`,
         data: attributes
       }
     }
   }
   show(id, queryParams) {
     return {
-      type: `${this.getCollection()}.${SHOW}`,
+      type: `${this.getControllerUrl()}.${SHOW}`,
       api: {
         method: 'GET',
-        url: `${this.getCollection()}/${id}`,
+        url: `${this.getControllerUrl()}/${id}`,
         params: queryParams
       }
     }
   }
   update(id, attributes) {
     return {
-      type: `${this.getCollection()}.${UPDATE}`,
+      type: `${this.getControllerUrl()}.${UPDATE}`,
       api: {
         method: 'PUT',
-        url: `${this.getCollection()}/${id}`,
+        url: `${this.getControllerUrl()}/${id}`,
         data: attributes
       }
     }
   }
   destroy(id) {
     return {
-      type: `${this.getCollection()}.${DESTROY}`,
+      type: `${this.getControllerUrl()}.${DESTROY}`,
       api: {
         method: 'DELETE',
-        url: `${this.getCollection()}/${id}`
+        url: `${this.getControllerUrl()}/${id}`
       }
     }
   }

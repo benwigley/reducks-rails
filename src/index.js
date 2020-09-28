@@ -1,5 +1,6 @@
 import normalize from './libs/normalize'
 import normalizedMerge from './libs/normalizedMerge'
+import entitySelectors from './libs/entitySelectors'
 import actionTypeModifiers from './libs/actionTypeModifiers'
 import registerCollections from './reducks/registerCollections'
 import {
@@ -15,6 +16,7 @@ export {
   normalizedMerge,
   actionTypeModifiers,
   registerCollections,
+  entitySelectors,
 
   setEntitiesAction,
   setEntitiesFromStateAction,

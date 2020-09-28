@@ -13,7 +13,7 @@ describe('parseResult', () => {
   it('returns an object in format: { response, metaData }', () => {
     const result = parseResult(testResponseUsers, testConfig)
     expect(isObject(result)).toBe(true)
-    expect(isObjectLike(result.response)).toBe(true)
+    expect(isObjectLike(result.data)).toBe(true)
     expect(isObjectLike(result.metaData)).toBe(true)
   })
 
@@ -22,7 +22,7 @@ describe('parseResult', () => {
       return { hello: 'there' }
     }
     const result = parseResult(testResponseUsers, testConfig)
-    expect(result.response.hello).toEqual('there')
+    expect(result.data.hello).toEqual('there')
   })
 
   it('applies a setMetaData method when given', () => {

@@ -17,7 +17,6 @@ const sessionStorage = {}
 const reducksRailsConfig = {
   debug: true,
   baseUrl: 'http://localhost:3000/',         // (required)
-  onError: () => { },   // (optional)
   axiosConfig: {        // (optional)
     // pass configuration directly to axios (ajax utility)
     headers: {
@@ -27,6 +26,8 @@ const reducksRailsConfig = {
   },
   camelCaseClientData: true,
   snakeCaseServerData: true,
+
+  onResponseError: (res, { store }) => {},   // (optional)
 
   parse: (json) => {
     return json

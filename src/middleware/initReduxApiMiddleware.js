@@ -4,29 +4,29 @@ import initApi from '../libs/api'
 import actionTypeModifiers from '../libs/actionTypeModifiers'
 
 export const parseResult = (json, inConfig) => {
-  const reponseParser = inConfig.parse
+  const dataParser = inConfig.parse
   const setMetaData = inConfig.setMetaData
-  let response
+  let data
   let metaData = {}
 
   // parse and metaData methods are currently not
   // per-collection, but this would be nice in the future.
-  switch(typeof reponseParser) {
+  switch(typeof dataParser) {
     case 'object': {
-      const parseMethod = reponseParser && reponseParser[resourceType]
+      const parseMethod = dataParser && dataParser[resourceType]
       if (!parseMethod) {
-        response = json
+        data = json
         break
       }
-      response = parseMethod(json)
+      data = parseMethod(json)
       break
     }
     case 'function': {
-      response = reponseParser(json)
+      data = dataParser(json)
       break
     }
     default: {
-      response = json
+      data = json
       break
     }
   }
@@ -49,7 +49,7 @@ export const parseResult = (json, inConfig) => {
     }
   }
 
-  return { response, metaData }
+  return { data, metaData }
 }
 
 
@@ -97,29 +97,33 @@ export const initReduxApiMiddleware = (inConfig) => {
       .then((res) => {
         // Inform the reducer that the request was successful
         console.log('next:', actionTypeModifiers.successTypeModifier(action.type));
+        const parsedData = parseResult(res.data, inConfig)
         next({
           ...action,
           type: actionTypeModifiers.successTypeModifier(action.type),
-          payload: parseResult(res.data, inConfig),
+          payload: parsedData,
         })
-        return res.data
+        return parsedData
       })
       .catch((e) => {
+        // Axios can throw actual errors and hide them if we're not careful
+        if (e instanceof TypeError) { throw e }
         logger.debug(`libs/reduxApi:failed:${action.api.url}`, e)
-        const data = ((e || {}).response || {}).data
-        const responseData = data || { errors: [e.toString()] }
 
-        if (typeof inConfig.onError === 'function') {
-          inConfig.onError(responseData)
+        const data = ((e || {}).response || {}).data
+        const responseError = data || { errors: [e.toString()] }
+
+        if (typeof inConfig.onResponseError === 'function') {
+          inConfig.onResponseError(responseError, { store, config, action })
         }
 
         // Inform the reducer that the request failed
         next({
           ...action,
           type: actionTypeModifiers.failureTypeModifier(action.type),
-          payload: responseData,
+          payload: responseError,
         })
-        return responseData
+        return responseError
       })
   }
   return reduxApiMiddleware
