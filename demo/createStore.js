@@ -64,7 +64,7 @@ const reducksRailsConfig = {
 }
 
 export default (initialState = {}) => {
-  return createStore(
+  const store = createStore(
     combineReducers({
       // reducerName: myOtherReducer
       ...registerCollections(users, posts, comments)
@@ -76,4 +76,11 @@ export default (initialState = {}) => {
       ...initReducksRailsMiddleware(reducksRailsConfig)
     ))
   )
+  if (typeof window !== 'undefined') {
+    window.users = users
+    window.posts = posts
+    window.comments = comments
+    window.store = store // so you can play with the store in the console for the demo
+  }
+  return store
 }
