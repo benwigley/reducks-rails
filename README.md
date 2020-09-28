@@ -1,5 +1,7 @@
 # ReducksRails
 
+[![Build Status](https://travis-ci.com/benwigley/reducks-rails.svg?branch=master)](https://travis-ci.com/benwigley/reducks-rails)
+
 Connect your app to Rails with Redux using the Ducks pattern and Rails-like Collections.
 
 ## Overview
