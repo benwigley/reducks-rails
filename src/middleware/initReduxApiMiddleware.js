@@ -3,9 +3,9 @@ import logger from '../libs/logger'
 import initApi from '../libs/api'
 import actionTypeModifiers from '../libs/actionTypeModifiers'
 
-const parseResult = (json, inConfig) => {
+export const parseResult = (json, inConfig) => {
   const reponseParser = inConfig.parse
-  const setMetadata = inConfig.setMetadata
+  const setMetaData = inConfig.setMetaData
   let response
   let metaData = {}
 
@@ -18,7 +18,6 @@ const parseResult = (json, inConfig) => {
         response = json
         break
       }
-
       response = parseMethod(json)
       break
     }
@@ -32,16 +31,16 @@ const parseResult = (json, inConfig) => {
     }
   }
 
-  switch(typeof setMetadata) {
+  switch(typeof setMetaData) {
     case 'object': {
-      const setMetadata = setMetadata && setMetadata[resourceType]
-      if (!setMetadata) { break }
+      const setMetaData = setMetaData && setMetaData[resourceType]
+      if (!setMetaData) { break }
 
-      metaData = setMetadata(json)
+      metaData = setMetaData(json)
       break
     }
     case 'function': {
-      metaData = setMetadata(json)
+      metaData = setMetaData(json)
       break
     }
     default: {
@@ -53,7 +52,8 @@ const parseResult = (json, inConfig) => {
   return { response, metaData }
 }
 
-const initReduxApiMiddleware = (inConfig) => {
+
+export const initReduxApiMiddleware = (inConfig) => {
 
   logger.shouldLog = inConfig.debug
 

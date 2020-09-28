@@ -1,25 +1,6 @@
 import { isFunction } from 'lodash'
-import testSchema from '../data/testSchema'
 import registerCollections from '../../src/reducks/registerCollections'
-import ReducksBaseCollection from '../../src/reducks/ReducksBaseCollection'
-
-class Users extends ReducksBaseCollection {
-  constructor() {
-    super()
-    this.schema = testSchema.users
-    this.mainSchema = testSchema
-  }
-}
-class Posts extends ReducksBaseCollection {
-  constructor() {
-    super()
-    this.schema = testSchema.posts
-    this.mainSchema = testSchema
-  }
-}
-
-const users = new Users()
-const posts = new Posts()
+import { users, posts } from '../support/createTestStore'
 
 
 describe('registerCollections', () => {

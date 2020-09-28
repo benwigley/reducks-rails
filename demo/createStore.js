@@ -31,7 +31,7 @@ const reducksRailsConfig = {
   parse: (json) => {
     return json
   },
-  setMetadata: (json) => {
+  setMetaData: (json) => {
     return {}
   },
 
