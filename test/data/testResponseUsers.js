@@ -11,8 +11,8 @@ export default [
   },
   {
     id: 16,
-    title: "How to Read Ducks",
-    avatar: find(testResponsePosts, a => a.userId == 16),
+    name: "Borris",
+    avatar: find(testResponseAvatars, a => a.userId == 16),
     posts: filter(testResponsePosts, p => p.userId == 16),
   },
 ]
