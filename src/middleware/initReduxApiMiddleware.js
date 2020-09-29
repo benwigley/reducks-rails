@@ -122,7 +122,11 @@ export const initReduxApiMiddleware = (inConfig) => {
         const responseError = data || { errors: [e.toString()] }
 
         if (typeof inConfig.onResponseError === 'function') {
-          inConfig.onResponseError(responseError, { store, config, action })
+          inConfig.onResponseError(responseError, {
+            store,
+            action,
+            config: inConfig
+          })
         }
 
         // Inform the reducer that the request failed
