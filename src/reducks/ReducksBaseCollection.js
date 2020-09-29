@@ -1,5 +1,6 @@
 import logger from '../libs/logger'
 import normalize from '../libs/normalize'
+import pathJoin from '../libs/pathJoin'
 import actionTypeModifiers from '../libs/actionTypeModifiers'
 import normalizedMerge from '../libs/normalizedMerge'
 import { sortBy, isArray } from 'lodash'
@@ -70,10 +71,11 @@ export class ReducksBaseCollection {
     return this.getCollectionSchema().collection
   }
 
-  getControllerUrl() {
+  getControllerPath(append='') {
     // TODO: If we have access to reducksConfig in future,
     //       use a snakeCaseCollectionUrl: <bool> option
-    return this.schema.controllerUrl || this.getCollectionSchema().getCollectionSchema
+    let path = this.schema.controllerPath || this.getCollection()
+    return pathJoin([path, append])
   }
 
   getCollectionSchema() {
@@ -106,6 +108,10 @@ export class ReducksBaseCollection {
       })
     }
     return ids
+  }
+
+  getNormalizedDataFrom(entityOrEntities) {
+    return normalize(entityOrEntities, this.getCollectionSchema(), this.getMainSchema())
   }
 
   reducer(state, action = {}) {
@@ -348,50 +354,50 @@ export class ReducksBaseCollection {
   // REST Actions
   index(queryParams={}) {
     return {
-      type: `${this.getControllerUrl()}.${INDEX}`,
+      type: `${this.getControllerPath()}.${INDEX}`,
       api: {
         method: 'GET',
-        url: `${this.getControllerUrl()}`,
+        url: `${this.getControllerPath()}`,
         params: queryParams
       }
     }
   }
   create(attributes) {
     return {
-      type: `${this.getControllerUrl()}.${CREATE}`,
+      type: `${this.getControllerPath()}.${CREATE}`,
       api: {
         method: 'POST',
-        url: `${this.getControllerUrl()}`,
+        url: `${this.getControllerPath()}`,
         data: attributes
       }
     }
   }
   show(id, queryParams) {
     return {
-      type: `${this.getControllerUrl()}.${SHOW}`,
+      type: `${this.getControllerPath()}.${SHOW}`,
       api: {
         method: 'GET',
-        url: `${this.getControllerUrl()}/${id}`,
+        url: `${this.getControllerPath()}/${id}`,
         params: queryParams
       }
     }
   }
   update(id, attributes) {
     return {
-      type: `${this.getControllerUrl()}.${UPDATE}`,
+      type: `${this.getControllerPath()}.${UPDATE}`,
       api: {
         method: 'PUT',
-        url: `${this.getControllerUrl()}/${id}`,
+        url: `${this.getControllerPath()}/${id}`,
         data: attributes
       }
     }
   }
   destroy(id) {
     return {
-      type: `${this.getControllerUrl()}.${DESTROY}`,
+      type: `${this.getControllerPath()}.${DESTROY}`,
       api: {
         method: 'DELETE',
-        url: `${this.getControllerUrl()}/${id}`
+        url: `${this.getControllerPath()}/${id}`
       }
     }
   }

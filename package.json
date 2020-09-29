@@ -1,6 +1,6 @@
 {
   "name": "reducks-rails",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Hook up Redux to Rails using the Reducks method",
   "main": "dist/reducks-rails.js",
   "scripts": {
@@ -37,7 +37,6 @@
     "pluralize": "^8.0.0",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "ts-jest": "^26.4.0",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   }

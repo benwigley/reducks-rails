@@ -23,10 +23,9 @@ class Users extends ReducksBaseCollection {
   }
 
   reducer(state, action = {}) {
-    if (!state) state = this.initialState
+
     state = super.reducer(state, action)
     switch (action.type) {
-
 
       // Rails: UsersController#update
       case this.requestTypeModifier(UPDATE_USER_FIRST_NAME):

@@ -114,3 +114,4 @@ Things to cover
 * Potentially add a way to create singular Resources
   * e.g. CurrentUser vs Users to fetch the authenticaed user
   * For now maybe some docs on how to implement a custom example such as currentUser in the Users collection
+* Add propTypes for collections (should require ids array and entities lookup)

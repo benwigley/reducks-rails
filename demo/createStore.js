@@ -6,7 +6,7 @@ import {
   initReducksRailsMiddleware
 } from 'reducks-rails'
 
-// Reducers
+// Reducks Collections
 import users from './reducks/users'
 import posts from './reducks/posts'
 import comments from './reducks/comments'
