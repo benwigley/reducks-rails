@@ -2,3 +2,6 @@ language: javascript
 
 node_js:
   - 13
+
+notifications:
+  slack: wigley:W1HhwKhKTIGc3a7rAAJzHnma
