@@ -110,6 +110,7 @@ Things to cover
 ## Project todo
 
 * Remove thunk dependency based on [redux-rails](https://github.com/instacart/redux-rails)
+* Add request queuing (also based on redux-rails)
 * Potentially add a way to create singular Resources
   * e.g. CurrentUser vs Users to fetch the authenticaed user
   * For now maybe some docs on how to implement a custom example such as currentUser in the Users collection

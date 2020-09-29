@@ -3,11 +3,20 @@ import logger from '../libs/logger'
 import initApi from '../libs/api'
 import actionTypeModifiers from '../libs/actionTypeModifiers'
 
-export const parseResult = (json, inConfig) => {
-  const dataParser = inConfig.parse
-  const setMetaData = inConfig.setMetaData
+export const parseResult = (json, inConfig, action={}) => {
+  let dataParser = inConfig.parse
+  let setMetaData = inConfig.setMetaData
   let data
   let metaData = {}
+
+  // Parse functions from actions override config
+  action.api = action.api || {}
+  if (typeof action.api.parse === 'function') {
+    dataParser = action.api.parse
+  }
+  if (typeof action.api.setMetaData === 'function') {
+    setMetaData = action.api.setMetaData
+  }
 
   // parse and metaData methods are currently not
   // per-collection, but this would be nice in the future.
@@ -96,8 +105,7 @@ export const initReduxApiMiddleware = (inConfig) => {
     return api.request(requestParams)
       .then((res) => {
         // Inform the reducer that the request was successful
-        console.log('next:', actionTypeModifiers.successTypeModifier(action.type));
-        const parsedData = parseResult(res.data, inConfig)
+        const parsedData = parseResult(res.data, inConfig, action)
         next({
           ...action,
           type: actionTypeModifiers.successTypeModifier(action.type),
