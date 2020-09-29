@@ -1,4 +1,4 @@
-import { isObject, isFunction } from 'lodash'
+import { isObject, isArray, isFunction } from 'lodash'
 import shared from '../libs/shared'
 
 // Returns a hash of reducers to be passed into combineReducers like so:
@@ -8,6 +8,10 @@ import shared from '../libs/shared'
 //  })
 
 export default (...collections) => {
+
+  // Allow either an array or many arguments
+  if (isArray(collections[0])) { collections = collections[0] }
+
   shared.collections = collections
 
   const reducersHash = {}
