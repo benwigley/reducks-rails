@@ -16,7 +16,7 @@ import { sortBy, isArray } from 'lodash'
 
 // Types
 export const SET_ENTITIES             = 'reducksRails/entities/SET_ENTITIES'
-export const SET_ENTITIES_FROM_STATE  = 'tjmer/entities/SET_ENTITIES_FROM_STATE'
+export const SET_ENTITIES_FROM_STATE  = 'reducksRails/entities/SET_ENTITIES_FROM_STATE'
 
 // Global Action Creators
 export function setEntities(normalizedData) {
