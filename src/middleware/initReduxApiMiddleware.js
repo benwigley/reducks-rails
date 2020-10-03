@@ -72,6 +72,10 @@ export const initReduxApiMiddleware = (inConfig) => {
 
   const reduxApiMiddleware = (store) => (next) => (action) => {
 
+    // Attach the inConfig to the action so we
+    // have access to it in reducers if needed
+    action.reducksRailsConfig = inConfig
+
     // Here we check whether an "api" or "nodeApi" key:object
     // has been given as a parameter in the dispatch({ ...action })
     // call, then skip this "reduxApi" middleware if not.
