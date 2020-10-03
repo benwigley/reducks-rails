@@ -54,6 +54,9 @@ export function normalizedMerge(existingState, newState) {
       // data intact or it would ruin our normalized data state.
       return existingStateProperty
     }
+    // Default, just return the first one that is truthy
+    if (existingStateProperty) { return existingStateProperty }
+    if (newStateProperty) { return newStateProperty }
   })
 }
 
