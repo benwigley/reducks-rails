@@ -53,13 +53,19 @@ export class ReducksBaseCollection {
     this.orderBy = null
     this.reverseOrder = false
 
+    // Bind all functions that make use of this
+    // and are/may be called outside of this class
     // Warning: Don't change these to use the modern function declaration
     //          e.g. () => {}
     //          It breaks things for some reason.
-    this.reducer = this.reducer.bind(this)
-    this.processApiRequest = this.processApiRequest.bind(this)
-    this.processApiSuccess = this.processApiSuccess.bind(this)
-    this.processApiFailure = this.processApiFailure.bind(this)
+    const methodsToBind = [
+      'reducer',
+      'processApiRequest', 'processApiSuccess', 'processApiFailure',
+      'index', 'show', 'create', 'update', 'destroy'
+    ]
+    methodsToBind.forEach(methodName => {
+      this[methodName] = this[methodName].bind(this)
+    })
 
     // Request Action Type Modifiers
     this.requestTypeModifier = actionTypeModifiers.requestTypeModifier
