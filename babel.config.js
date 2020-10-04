@@ -1,5 +1,5 @@
 module.exports = {
-  plugins: ["@babel/plugin-transform-classes"],
+  plugins: ["@babel/plugin-transform-classes", 'lodash'],
   presets: [
     [
       "@babel/preset-env", {

@@ -1,4 +1,6 @@
 const path = require('path')
+const TerserPlugin = require('terser-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 console.log('Directory: ', __dirname)
 
@@ -30,8 +32,16 @@ module.exports = env => {
       libraryTarget: 'umd',
       globalObject: 'typeof self !== \'undefined\' ? self : this'
     },
+    optimization: {
+      minimize: true,
+      minimizer: [
+        env.production && new TerserPlugin({
+          test: /\.js(\?.*)?$/i,
+        }),
+      ].filter(plugin => !!plugin),
+    },
     plugins: [
-      // somePluginEnabled && new SomePlugin()
+      env.development && new BundleAnalyzerPlugin(),
     ].filter(plugin => !!plugin) // filter out false items
   }
 }
