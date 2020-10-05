@@ -1,5 +1,6 @@
 const path = require('path')
 const TerserPlugin = require('terser-webpack-plugin')
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 console.log('Directory: ', __dirname)
@@ -41,6 +42,10 @@ module.exports = env => {
       ].filter(plugin => !!plugin),
     },
     plugins: [
+      new LodashModuleReplacementPlugin({
+        collections: true,
+        shorthands: true
+      }),
       env.development && new BundleAnalyzerPlugin(),
     ].filter(plugin => !!plugin) // filter out false items
   }

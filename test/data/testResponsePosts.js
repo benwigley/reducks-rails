@@ -1,4 +1,3 @@
-import { filter } from 'lodash'
 import testResponseComments from './testResponseComments'
 
 export default [
@@ -8,7 +7,7 @@ export default [
     id: 122,
     userId: 16,
     title: "How to Be a Duck",
-    comments: filter(testResponseComments, comment => comment.postId == 122)
+    comments: testResponseComments.filter(comment => comment.postId == 122)
   },
 
   // userId: 14, 3 posts
@@ -27,6 +26,6 @@ export default [
     id: 125,
     userId: 14,
     title: "Quack Quack",
-    comments: filter(testResponseComments, comment => comment.postId == 125)
+    comments: testResponseComments.filter(comment => comment.postId == 125)
   },
 ]

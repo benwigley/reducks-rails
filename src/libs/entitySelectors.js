@@ -1,4 +1,4 @@
-import { map, filter, isMatch, find, isObject, isArray } from "lodash"
+import { filter, find, isObject, isArray } from "lodash"
 
 function validateResource(resource) {
   if (!isObject(resource)) {
@@ -11,7 +11,7 @@ function validateResource(resource) {
 
 export const getEntitiesArray = (resource) => {
   validateResource(resource)
-  return map(resource.ids, id => resource.entities[id])
+  return resource.ids.map(id => resource.entities[id])
 }
 
 export const where = (resource, matchAttrs) => {
@@ -23,7 +23,7 @@ export const findWhere = (resource, matchAttrs) => {
 }
 
 export const entitiesMap = (resource, mapper) => {
-  return map(getEntitiesArray(resource), mapper)
+  return getEntitiesArray(resource).map(mapper)
 }
 
 export const entitiesFilter = (resource, predicate) => {

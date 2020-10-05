@@ -1,6 +1,6 @@
 import normalizedMerge from './normalizedMerge'
 import pluralize from 'pluralize'
-import { map, keyBy, isArray, cloneDeep, unionWith, isObject, isNil } from 'lodash'
+import { keyBy, isArray, cloneDeep, unionWith, isObject, isNil } from 'lodash'
 import logger from './logger'
 
 let count
@@ -61,13 +61,13 @@ function processNestedCollections(withSchema, entitiesArray, baseCollectionsLook
         // Update the base collection with any new items found
         baseCollectionsLookup[nestedSchema.collection] = normalizedMerge(baseCollectionsLookup[nestedSchema.collection], {
           entities: keyBy(nestedSchemasArray, 'id'),
-          ids: map(nestedSchemasArray, e => e.id)
+          ids: nestedSchemasArray.map(e => e.id)
         }, false)
 
         // Clean Up
         // Replace the nested collection with a list of ids
         if (isNestedItemAnArray) {
-          entitiesArray[index][`${pluralize.singular(nestedSchema.key)}Ids`] = map(nestedSchemasArray, (e) => e.id)
+          entitiesArray[index][`${pluralize.singular(nestedSchema.key)}Ids`] = nestedSchemasArray.map(e => e.id)
         }
         entitiesArray[index][`${nestedSchema.key}Fetched`] = true
         delete entitiesArray[index][nestedSchema.key]
@@ -117,7 +117,7 @@ export default function normalize(baseEntitiesArray, baseSchema, mainSchema) {
 
   baseCollectionsLookup[baseSchema.collection] = {
     entities: keyBy(clonedBaseEntitiesArray, 'id'),
-    ids: map(clonedBaseEntitiesArray, e => e.id)
+    ids: clonedBaseEntitiesArray.map(e => e.id)
   }
 
   logger.debug(`Normalize: Processed ${count} nested collections in collection:${baseSchema.collection}`)
