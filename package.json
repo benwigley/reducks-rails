@@ -1,6 +1,6 @@
 {
   "name": "reducks-rails",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Hook up Redux to Rails using the Reducks method",
   "main": "dist/reducks-rails.js",
   "scripts": {

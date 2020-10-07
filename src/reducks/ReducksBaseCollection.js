@@ -384,7 +384,7 @@ export class ReducksBaseCollection {
       type: `${this.getControllerPath()}.${SHOW}`,
       api: {
         method: 'GET',
-        url: `${this.getControllerPath()}/${id}`,
+        url: this.getControllerPath(id),
         params: queryParams
       }
     }
@@ -394,7 +394,7 @@ export class ReducksBaseCollection {
       type: `${this.getControllerPath()}.${UPDATE}`,
       api: {
         method: 'PUT',
-        url: `${this.getControllerPath()}/${id}`,
+        url: this.getControllerPath(id),
         data: attributes,
       }
     }
@@ -404,7 +404,7 @@ export class ReducksBaseCollection {
       type: `${this.getControllerPath()}.${DESTROY}`,
       api: {
         method: 'DELETE',
-        url: `${this.getControllerPath()}/${id}`
+        url: this.getControllerPath(id)
       }
     }
   }
