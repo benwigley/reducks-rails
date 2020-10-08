@@ -166,64 +166,63 @@ export class ReducksBaseCollection {
       //
 
       // POST /:collectionName
-      case this.requestTypeModifier(`${this.getControllerPath()}.${INDEX}`):
+      case this.requestTypeModifier(`${this.getCollection()}.${INDEX}`):
         return this.processApiRequest({
           state: { ...state, isLoadingIndex: true },
           action
         })
-      case this.successTypeModifier(`${this.getControllerPath()}.${INDEX}`):
+      case this.successTypeModifier(`${this.getCollection()}.${INDEX}`):
         return this.processApiSuccess({
           state: { ...state, isLoadingIndex: false },
           action
         })
-      case this.failureTypeModifier(`${this.getControllerPath()}.${INDEX}`):
+      case this.failureTypeModifier(`${this.getCollection()}.${INDEX}`):
         return this.processApiFailure({
           state: { ...state, isLoadingIndex: false },
           action
         })
 
       // POST /:collectionName
-      case this.requestTypeModifier(`${this.getControllerPath()}.${CREATE}`):
+      case this.requestTypeModifier(`${this.getCollection()}.${CREATE}`):
         return this.processApiRequest({
           state: { ...state, isCreatingEntity: action.data },
           action
         })
-      case this.successTypeModifier(`${this.getControllerPath()}.${CREATE}`):
+      case this.successTypeModifier(`${this.getCollection()}.${CREATE}`):
         return this.processApiSuccess({
           state: { ...state, isCreatingEntity: null },
           action
         })
-      case this.failureTypeModifier(`${this.getControllerPath()}.${CREATE}`):
+      case this.failureTypeModifier(`${this.getCollection()}.${CREATE}`):
         return this.processApiFailure({
           state: { ...state, isCreatingEntity: null },
           action
         })
 
       // GET /:collectionName/:id
-      case this.requestTypeModifier(`${this.getControllerPath()}.${SHOW}`):
+      case this.requestTypeModifier(`${this.getCollection()}.${SHOW}`):
         return this.processApiRequest({
           state: { ...state, isFetchingEntityId: action.id },
           action
         })
-      case this.successTypeModifier(`${this.getControllerPath()}.${SHOW}`):
+      case this.successTypeModifier(`${this.getCollection()}.${SHOW}`):
         return this.processApiSuccess({
           state: { ...state, isFetchingEntityId: null },
           action
         })
-      case this.failureTypeModifier(`${this.getControllerPath()}.${SHOW}`):
+      case this.failureTypeModifier(`${this.getCollection()}.${SHOW}`):
         return this.processApiFailure({
           state: { ...state, isFetchingEntityId: null },
           action
         })
 
       // PUT /:collectionName/:id
-      case this.requestTypeModifier(`${this.getControllerPath()}.${UPDATE}`):
+      case this.requestTypeModifier(`${this.getCollection()}.${UPDATE}`):
         return this.processApiRequest({
           state: { ...state, isUpdatingEntityId: action.id },
           action
         })
-      case this.successTypeModifier(`${this.getControllerPath()}.${UPDATE}`):
-        console.log('update, processApiSuccess');
+      case this.successTypeModifier(`${this.getCollection()}.${UPDATE}`):
         return this.processApiSuccess({
           state: { ...state, isUpdatingEntityId: null },
           action,
@@ -233,24 +232,27 @@ export class ReducksBaseCollection {
           //   return newState
           // }
         })
-      case this.failureTypeModifier(`${this.getControllerPath()}.${UPDATE}`):
+      case this.failureTypeModifier(`${this.getCollection()}.${UPDATE}`):
         return this.processApiFailure({
           state: { ...state, isUpdatingEntityId: null },
           action
         })
 
       // DELETE /:collectionName/:id
-      case this.requestTypeModifier(`${this.getControllerPath()}.${DESTROY}`):
+      case this.requestTypeModifier(`${this.getCollection()}.${DESTROY}`):
         return this.processApiRequest({
           state: { ...state, isDeletingEntityId: action.id },
           action
         })
-      case this.successTypeModifier(`${this.getControllerPath()}.${DESTROY}`):
+      case this.successTypeModifier(`${this.getCollection()}.${DESTROY}`):
         return this.processApiSuccess({
-          state: { ...this.removeEntityById(state, action.id), isDeletingEntityId: null },
+          state: {
+            ...this.removeEntityById(state, action.id),
+            isDeletingEntityId: null
+          },
           action
         })
-      case this.failureTypeModifier(`${this.getControllerPath()}.${DESTROY}`):
+      case this.failureTypeModifier(`${this.getCollection()}.${DESTROY}`):
         return this.processApiFailure({
           state: { ...state, isDeletingEntityId: null },
           action
@@ -361,7 +363,7 @@ export class ReducksBaseCollection {
   // REST Actions
   index(queryParams={}) {
     return {
-      type: `${this.getControllerPath()}.${INDEX}`,
+      type: `${this.getCollection()}.${INDEX}`,
       api: {
         method: 'GET',
         url: `${this.getControllerPath()}`,
@@ -371,7 +373,7 @@ export class ReducksBaseCollection {
   }
   create(attributes) {
     return {
-      type: `${this.getControllerPath()}.${CREATE}`,
+      type: `${this.getCollection()}.${CREATE}`,
       api: {
         method: 'POST',
         url: `${this.getControllerPath()}`,
@@ -381,31 +383,34 @@ export class ReducksBaseCollection {
   }
   show(id, queryParams) {
     return {
-      type: `${this.getControllerPath()}.${SHOW}`,
+      type: `${this.getCollection()}.${SHOW}`,
       api: {
         method: 'GET',
         url: this.getControllerPath(id),
         params: queryParams
-      }
+      },
+      id
     }
   }
   update(id, attributes) {
     return {
-      type: `${this.getControllerPath()}.${UPDATE}`,
+      type: `${this.getCollection()}.${UPDATE}`,
       api: {
         method: 'PUT',
         url: this.getControllerPath(id),
         data: attributes,
-      }
+      },
+      id
     }
   }
   destroy(id) {
     return {
-      type: `${this.getControllerPath()}.${DESTROY}`,
+      type: `${this.getCollection()}.${DESTROY}`,
       api: {
         method: 'DELETE',
         url: this.getControllerPath(id)
-      }
+      },
+      id
     }
   }
 }
