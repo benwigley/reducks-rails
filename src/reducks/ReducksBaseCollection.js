@@ -185,7 +185,7 @@ export class ReducksBaseCollection {
       // POST /:collectionName
       case this.requestTypeModifier(`${this.getCollection()}.${CREATE}`):
         return this.processApiRequest({
-          state: { ...state, isCreatingEntity: action.data },
+          state: { ...state, isCreatingEntity: action.api.data },
           action
         })
       case this.successTypeModifier(`${this.getCollection()}.${CREATE}`):
