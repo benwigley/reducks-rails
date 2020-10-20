@@ -26,4 +26,12 @@ describe('normalizedMerge', () => {
     expect(normalizedMerge(obj1, obj2)).toEqual(merge1and2result)
   })
 
+  it('should prioritize attributes from the second object', () => {
+    expect(normalizedMerge({
+      testAttr: 'firstObject'
+    }, {
+      testAttr: 'secondObject'
+    })).toEqual({ testAttr: 'secondObject' })
+  })
+
 })

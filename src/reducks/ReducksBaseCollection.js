@@ -165,7 +165,7 @@ export class ReducksBaseCollection {
       // Default REST Resource Actions
       //
 
-      // POST /:collectionName
+      // GET /:collectionName
       case this.requestTypeModifier(`${this.getCollection()}.${INDEX}`):
         return this.processApiRequest({
           state: { ...state, isLoadingIndex: true },
@@ -223,7 +223,7 @@ export class ReducksBaseCollection {
           action
         })
       case this.successTypeModifier(`${this.getCollection()}.${UPDATE}`):
-        return this.processApiSuccess({
+        let updatedState = this.processApiSuccess({
           state: { ...state, isUpdatingEntityId: null },
           action,
           // Example of transforming the final state returned from this.processApiSuccess
@@ -232,6 +232,7 @@ export class ReducksBaseCollection {
           //   return newState
           // }
         })
+        return updatedState
       case this.failureTypeModifier(`${this.getCollection()}.${UPDATE}`):
         return this.processApiFailure({
           state: { ...state, isUpdatingEntityId: null },
@@ -270,7 +271,6 @@ export class ReducksBaseCollection {
   processApiSuccess({ state, action, dataTransformer }) {
     logger.log(`ReducksBaseCollection:${this.constructor.name}:processApiSuccess`)
     if (!dataTransformer) dataTransformer = (normalizedData, newState) => newState
-
     const returnState = {
       ...state,
       isLoading: false,
