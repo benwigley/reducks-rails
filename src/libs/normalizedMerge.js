@@ -1,5 +1,5 @@
 // import logger from './logger'
-import { cloneDeep, mergeWith, isArray, union } from 'lodash'
+import { cloneDeep, mergeWith, isArray, union, isNil } from 'lodash'
 
 // Merges two objects together
 // Aids in concatenating two reducks Collections together so
@@ -54,8 +54,8 @@ export function normalizedMerge(existingState, newState) {
       // data intact or it would ruin our normalized data state.
       return existingStateProperty
     }
-    if (typeof newStateProperty !== 'undefined') { return newStateProperty }
-    if (typeof existingStateProperty !== 'undefined') { return existingStateProperty }
+    if (!isNil(newStateProperty)) { return newStateProperty }
+    if (!isNil(existingStateProperty)) { return existingStateProperty }
   })
 }
 
